@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Bash(./mvnw clean compile:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(mvn test:*)"
+    ]
+  }
+}

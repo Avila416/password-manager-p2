@@ -1,0 +1,51 @@
+<h2>User Registration</h2>
+
+<div>
+  <input
+    placeholder="Name"
+    [value]="user.name"
+    (input)="user.name = $any($event.target).value"
+  />
+
+  <input
+    placeholder="Email"
+    [value]="user.email"
+    (input)="user.email = $any($event.target).value"
+  />
+
+  <input
+    type="password"
+    placeholder="Password"
+    [value]="user.password"
+    (input)="user.password = $any($event.target).value"
+  />
+
+  <button (click)="saveUser()">
+    {{ editingId ? 'Update' : 'Create' }}
+  </button>
+
+  <button (click)="resetForm()">Clear</button>
+</div>
+
+<hr>
+
+<h2>User List</h2>
+
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Actions</th>
+  </tr>
+
+  <tr *ngFor="let u of users">
+    <td>{{u.id}}</td>
+    <td>{{u.name}}</td>
+    <td>{{u.email}}</td>
+    <td>
+      <button (click)="editUser(u)">Edit</button>
+      <button (click)="deleteUser(u.id!)">Delete</button>
+    </td>
+  </tr>
+</table>
