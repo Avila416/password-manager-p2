@@ -1,12 +1,9 @@
-package com.passwordmanager.vault.service.impl;
+package com.passwordmanager.vault.service;
 
 import com.passwordmanager.vault.dto.*;
 import com.passwordmanager.vault.entity.PasswordEntry;
 import com.passwordmanager.vault.repository.PasswordEntryRepository;
-import com.passwordmanager.vault.service.VaultService;
-import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,16 +12,19 @@ import java.util.stream.Collectors;
 @Service
 public class VaultServiceImpl implements VaultService {
 
-    
     private final PasswordEntryRepository repository;
+
+    public VaultServiceImpl(PasswordEntryRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public PasswordEntryResponseDTO addEntry(PasswordEntryRequestDTO dto) {
 
         PasswordEntry entry = new PasswordEntry();
-        entry.setSite(dto.getSite());
+        entry.setWebsite(dto.getWebsite());
         entry.setUsername(dto.getUsername());
-        entry.setPassword(dto.getPassword());
+        entry.setEncryptedPassword(dto.getPassword());
         entry.setFavorite(false);
 
         repository.save(entry);
@@ -38,9 +38,9 @@ public class VaultServiceImpl implements VaultService {
         PasswordEntry entry = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry not found"));
 
-        entry.setSite(dto.getSite());
+        entry.setWebsite(dto.getWebsite());
         entry.setUsername(dto.getUsername());
-        entry.setPassword(dto.getPassword());
+        entry.setEncryptedPassword(dto.getPassword());
 
         repository.save(entry);
 
@@ -105,7 +105,7 @@ public class VaultServiceImpl implements VaultService {
         return repository.findAll()
                 .stream()
                 .filter(entry -> dto.getKeyword() == null ||
-                        entry.getSite().contains(dto.getKeyword()))
+                        entry.getWebsite().contains(dto.getKeyword()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -114,9 +114,9 @@ public class VaultServiceImpl implements VaultService {
 
         PasswordEntryResponseDTO dto = new PasswordEntryResponseDTO();
         dto.setId(entry.getId());
-        dto.setSite(entry.getSite());
+        dto.setWebsite(entry.getWebsite());
         dto.setUsername(entry.getUsername());
-        dto.setPassword(entry.getPassword());
+        dto.setPassword(entry.getEncryptedPassword());
         dto.setFavorite(entry.isFavorite());
 
         return dto;

@@ -2,7 +2,6 @@ package com.passwordmanager.vault.controller;
 
 import com.passwordmanager.vault.dto.*;
 import com.passwordmanager.vault.service.VaultService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,11 +9,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/vault")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
 public class VaultController {
 
     private final VaultService service;
+
+    public VaultController(VaultService service) {
+        this.service = service;
+    }
 
     // Create Entry
     @PostMapping
