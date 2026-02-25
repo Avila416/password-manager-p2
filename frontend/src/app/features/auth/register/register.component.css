@@ -1,0 +1,105 @@
+/* Background */
+/* Full Page Background */
+.register-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FCF5EE;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card */
+.register-card {
+  background-color: #ffffff;
+  padding: 40px;
+  width: 380px;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(133, 14, 53, 0.15);
+  border: 2px solid #FFC4C4;
+  transition: 0.3s ease;
+}
+
+.register-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Title */
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #850E35;
+  font-weight: 700;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 2px solid #FFC4C4;
+  outline: none;
+  font-size: 14px;
+  transition: 0.3s ease;
+  background-color: #FCF5EE;
+}
+
+/* Focus */
+input:focus {
+  border-color: #EE6983;
+  box-shadow: 0 0 0 3px rgba(238, 105, 131, 0.2);
+}
+
+/* Valid */
+input.ng-valid.ng-touched {
+  border-color: #EE6983;
+  background-color: #fff0f3;
+}
+
+/* Invalid */
+input.ng-invalid.ng-touched {
+  border-color: #850E35;
+  background-color: #ffe5e9;
+}
+
+/* Error Text */
+.error {
+  font-size: 12px;
+  color: #850E35;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+/* Register Button */
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Enabled */
+button:not(:disabled) {
+  background-color: #EE6983;
+  color: #ffffff;
+}
+
+/* Hover */
+button:not(:disabled):hover {
+  background-color: #850E35;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(133, 14, 53, 0.3);
+}
+
+/* Disabled */
+button:disabled {
+  background-color: #FFC4C4;
+  color: #850E35;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
