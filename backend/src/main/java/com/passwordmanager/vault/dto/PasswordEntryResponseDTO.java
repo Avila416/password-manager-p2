@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 
 import com.passwordmanager.vault.entity.Category;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PasswordEntryResponseDTO {
 
     private Long id;
