@@ -1,23 +1,15 @@
 package com.passwordmanager.vault.dto;
 
-import java.time.LocalDateTime;
-
 import com.passwordmanager.vault.entity.Category;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
-
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PasswordEntryResponseDTO {
 
     private Long id;
     private String title;
     private String username;
-    private String password;
+    private String encryptedPassword;
     private String website;
     private Category category;
     private boolean favorite;
@@ -48,11 +40,11 @@ public class PasswordEntryResponseDTO {
     }
 
     public String getPassword() {
-        return password;
+        return encryptedPassword;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.encryptedPassword = password;
     }
 
     public String getWebsite() {
@@ -86,6 +78,4 @@ public class PasswordEntryResponseDTO {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    
 }

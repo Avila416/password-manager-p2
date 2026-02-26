@@ -1,16 +1,24 @@
 package com.passwordmanager.vault.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.passwordmanager.vault.entity.Category;
 
-import lombok.Data;
+import jakarta.validation.constraints.Size;
 
-@Data
 public class UpdatePasswordEntryDTO {
 
+    @Size(max = 100, message = "Title cannot exceed 100 characters")
     private String title;
+
+    @Size(max = 120, message = "Username cannot exceed 120 characters")
     private String username;
+
+    @Size(min = 4, max = 256, message = "Password length must be between 4 and 256")
     private String password;
+
+    @Size(max = 200, message = "Website cannot exceed 200 characters")
     private String website;
+
     private Category category;
     private Boolean favorite;
 
@@ -34,6 +42,7 @@ public class UpdatePasswordEntryDTO {
         return password;
     }
 
+    @JsonAlias({"password", "encryptedPassword"})
     public void setPassword(String password) {
         this.password = password;
     }
@@ -61,6 +70,4 @@ public class UpdatePasswordEntryDTO {
     public void setFavorite(Boolean favorite) {
         this.favorite = favorite;
     }
-
-    
 }

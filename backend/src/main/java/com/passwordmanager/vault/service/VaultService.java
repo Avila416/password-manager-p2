@@ -23,8 +23,11 @@ public interface VaultService {
 
     List<PasswordEntryResponseDTO> getFavorites();
 
+    List<PasswordEntryResponseDTO> getEntriesByDomain(String domain);
+
     List<PasswordEntryResponseDTO> searchAndFilter(
             SearchFilterDTO dto,
             String sortBy,
             String direction);
 }
+

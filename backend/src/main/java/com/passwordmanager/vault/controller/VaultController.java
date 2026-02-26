@@ -1,15 +1,25 @@
 package com.passwordmanager.vault.controller;
 
-import com.passwordmanager.vault.dto.*;
+import com.passwordmanager.vault.dto.MasterPasswordVerifyDTO;
+import com.passwordmanager.vault.dto.PasswordEntryRequestDTO;
+import com.passwordmanager.vault.dto.PasswordEntryResponseDTO;
+import com.passwordmanager.vault.dto.SearchFilterDTO;
+import com.passwordmanager.vault.dto.UpdatePasswordEntryDTO;
 import com.passwordmanager.vault.service.VaultService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/vault")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(originPatterns = {"http://localhost:*", "chrome-extension://*"})
+@Validated
 public class VaultController {
 
     private final VaultService service;
@@ -18,67 +28,65 @@ public class VaultController {
         this.service = service;
     }
 
-    // Create Entry
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PasswordEntryResponseDTO add(@RequestBody PasswordEntryRequestDTO dto) {
+    public PasswordEntryResponseDTO add(@Valid @RequestBody PasswordEntryRequestDTO dto) {
         return service.addEntry(dto);
     }
 
-    // Update Entry
     @PutMapping("/{id}")
-    public PasswordEntryResponseDTO update(@PathVariable Long id,
-                                           @RequestBody UpdatePasswordEntryDTO dto) {
+    public PasswordEntryResponseDTO update(@PathVariable @Positive Long id,
+                                           @Valid @RequestBody UpdatePasswordEntryDTO dto) {
         return service.updateEntry(id, dto);
     }
 
-    // Delete Entry (Master password as request param - safer)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id,
-                       @RequestParam String masterPassword) {
-        service.deleteEntry(id, masterPassword);
+    public void delete(@PathVariable @Positive Long id,
+                       @RequestParam @NotBlank(message = "Master password is required") String masterPassword) {
+        service.deleteEntry(id, masterPassword.trim());
     }
 
-    // Get All Entries
     @GetMapping
     public List<PasswordEntryResponseDTO> getAll() {
         return service.getAllEntries();
     }
 
-    // Get Single Entry (verify using request param)
     @GetMapping("/{id}")
-    public PasswordEntryResponseDTO getById(@PathVariable Long id,
-                                            @RequestParam String masterPassword) {
-        return service.getEntryById(id, masterPassword);
+    public PasswordEntryResponseDTO getById(@PathVariable @Positive Long id,
+                                            @RequestParam @NotBlank(message = "Master password is required") String masterPassword) {
+        return service.getEntryById(id, masterPassword.trim());
     }
 
-    // Verify + Fetch (POST style)
     @PostMapping("/{id}/verify")
-    public PasswordEntryResponseDTO verifyAndGet(@PathVariable Long id,
-                                                 @RequestBody MasterPasswordVerifyDTO dto) {
-        return service.getEntryById(id, dto.getMasterPassword());
+    public PasswordEntryResponseDTO verifyAndGet(@PathVariable @Positive Long id,
+                                                 @Valid @RequestBody MasterPasswordVerifyDTO dto) {
+        return service.getEntryById(id, dto.getMasterPassword().trim());
     }
 
-    // Mark as Favorite
     @PutMapping("/{id}/favorite")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void markFavorite(@PathVariable Long id) {
+    public void markFavorite(@PathVariable @Positive Long id) {
         service.markFavorite(id);
     }
 
-    // Get Favorites
     @GetMapping("/favorites")
     public List<PasswordEntryResponseDTO> getFavorites() {
         return service.getFavorites();
     }
 
-    // Search + Filter + Sort
+    @GetMapping("/by-domain")
+    public List<PasswordEntryResponseDTO> getByDomain(
+            @RequestParam @NotBlank(message = "Domain is required") String domain) {
+        return service.getEntriesByDomain(domain.trim());
+    }
+
     @PostMapping("/search")
     public List<PasswordEntryResponseDTO> search(
-            @RequestBody SearchFilterDTO dto,
+            @Valid @RequestBody SearchFilterDTO dto,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String direction) {
+            @RequestParam(required = false)
+            @Pattern(regexp = "^(asc|desc)?$", message = "direction must be asc or desc") String direction) {
 
         return service.searchAndFilter(dto, sortBy, direction);
     }

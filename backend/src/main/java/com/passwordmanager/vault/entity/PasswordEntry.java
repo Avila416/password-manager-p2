@@ -1,7 +1,5 @@
 package com.passwordmanager.vault.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,18 +7,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class PasswordEntry {
 
     @Id
@@ -28,7 +18,6 @@ public class PasswordEntry {
     private Long id;
 
     private String title;
-
     private String username;
 
     @Column(length = 2000)
@@ -40,9 +29,7 @@ public class PasswordEntry {
     private Category category;
 
     private boolean favorite;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
     public Long getId() {
@@ -116,6 +103,4 @@ public class PasswordEntry {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    
 }

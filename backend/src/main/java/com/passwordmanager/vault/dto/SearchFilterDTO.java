@@ -2,14 +2,18 @@ package com.passwordmanager.vault.dto;
 
 import com.passwordmanager.vault.entity.Category;
 
-import lombok.Data;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-@Data
 public class SearchFilterDTO {
 
+    @Size(max = 100, message = "Keyword cannot exceed 100 characters")
     private String keyword;
+
     private Category category;
-    private String sortBy; // title or createdAt
+
+    @Pattern(regexp = "^(title|createdAt|date)?$", message = "sortBy must be title or createdAt")
+    private String sortBy;
 
     public String getKeyword() {
         return keyword;
@@ -34,7 +38,4 @@ public class SearchFilterDTO {
     public void setSortBy(String sortBy) {
         this.sortBy = sortBy;
     }
-
-
-    
 }
