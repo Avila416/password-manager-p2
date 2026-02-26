@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+}
+
+.sidebar {
+  background: #17345d;
+  color: #fff;
+  padding: 24px 16px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.sidebar h1 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.sidebar a {
+  color: #d9e6f5;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+  background: #265892;
+  color: #fff;
+}
+
+.content {
+  padding: 20px;
+}
+
+@media (max-width: 840px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+  }
+
+  .sidebar h1 {
+    grid-column: 1 / -1;
+  }
+}
