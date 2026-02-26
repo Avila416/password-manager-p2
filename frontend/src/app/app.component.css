@@ -1,0 +1,49 @@
+﻿.layout {
+  min-height: 100vh;
+  background: linear-gradient(140deg, #f1f6ff 0%, #eef4ff 45%, #f7fbff 100%);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid #1d4ea3;
+  background: linear-gradient(90deg, #1f4aa5, #2f63c6);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.topbar a,
+.topbar button {
+  color: #21427f;
+  text-decoration: none;
+  font-size: 0.92rem;
+  border: 1px solid #b7cdf8;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #eef4ff;
+  cursor: pointer;
+}
+
+.topbar a:hover,
+.topbar button:hover {
+  background: #dce9ff;
+}
+
+.content {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}

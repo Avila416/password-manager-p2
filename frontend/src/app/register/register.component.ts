@@ -1,72 +1,60 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
-import User from '../models/user.model';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-register',
-  templateUrl: './register.component.html'
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
-export class RegisterComponent implements OnInit {
-
-  users: User[] = [];
-
-  user: User = {
+export class RegisterComponent {
+  form = {
     name: '',
     email: '',
-    password: ''
+    password: '',
+    phone: ''
   };
 
-  editingId?: number;
+  message = '';
+  error = '';
 
-  constructor(private service: UserService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {
-    this.loadUsers();
-  }
+  register() {
+    this.error = '';
+    this.message = '';
 
-
-getUsers() {
-  this.service.getUsers().subscribe(data => {
-    this.users = data;
-  });
-}
-
-
-  loadUsers() {
-    this.service.getUsers().subscribe(data => {
-      this.users = data;
+    this.authService.register(this.form).subscribe({
+      next: (resp) => {
+        this.authService.saveToken(resp.token);
+        this.message = resp.message;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.error = this.extractError(err);
+      }
     });
   }
 
-  saveUser() {
-    if (this.editingId) {
-      this.service.updateUser(this.editingId, this.user)
-        .subscribe(() => {
-          this.resetForm();
-          this.loadUsers();
-        });
-    } else {
-      this.service.createUser(this.user)
-        .subscribe(() => {
-          this.resetForm();
-          this.loadUsers();
-        });
+  private extractError(err: any): string {
+    const payload = err?.error;
+    if (typeof payload === 'string' && payload.trim()) {
+      return payload.trim();
     }
-  }
 
-  editUser(user: User) {
-    this.user = { ...user };
-    this.editingId = user.id;
-  }
+    const message = payload?.message ?? payload?.error;
+    if (typeof message === 'string' && message.trim()) {
+      return message.trim();
+    }
 
-  deleteUser(id: number) {
-    this.service.deleteUser(id)
-      .subscribe(() => this.loadUsers());
-  }
+    const details = payload?.details;
+    if (details && typeof details === 'object') {
+      const firstDetail = Object.values(details)[0];
+      if (typeof firstDetail === 'string' && firstDetail.trim()) {
+        return firstDetail.trim();
+      }
+    }
 
-  resetForm() {
-    this.user = { name: '', email: '', password: '' };
-    this.editingId = undefined;
+    return 'Registration failed';
   }
 }
-

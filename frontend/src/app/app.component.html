@@ -1,1 +1,16 @@
-<app-register></app-register>
+<div class="layout">
+  <header class="topbar">
+    <h1>Password Manager</h1>
+    <nav>
+      <a routerLink="/login">Login</a>
+      <a routerLink="/register">Register</a>
+      <a routerLink="/forgot-password">Forgot Password</a>
+      <a *ngIf="authService.isAuthenticated()" routerLink="/master-password">Master Password</a>
+      <button *ngIf="authService.isAuthenticated()" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
