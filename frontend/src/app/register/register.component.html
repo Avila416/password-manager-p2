@@ -1,0 +1,26 @@
+<section class="card">
+  <h2>Create Account</h2>
+  <label>
+    Name
+    <input [(ngModel)]="form.name" name="name" />
+  </label>
+
+  <label>
+    Email
+    <input [(ngModel)]="form.email" name="email" />
+  </label>
+
+  <label>
+    Password
+    <input type="password" [(ngModel)]="form.password" name="password" />
+  </label>
+
+  <label>
+    Phone
+    <input [(ngModel)]="form.phone" name="phone" />
+  </label>
+
+  <button (click)="register()">Register</button>
+  <p class="ok" *ngIf="message">{{ message }}</p>
+  <p class="err" *ngIf="error">{{ error }}</p>
+</section>

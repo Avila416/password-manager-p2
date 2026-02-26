@@ -8,9 +8,17 @@ import { VaultComponent } from './vault/vault.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AuthRequiredComponent } from './auth-required/auth-required.component';
 import { AuthTokenInterceptor } from './interceptors/auth-token.interceptor';
+import { RegisterComponent } from './register/register.component';
+
+import { LoginComponent } from './login/login.component';
+import { MasterPasswordComponent } from './master-password/master-password.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 @NgModule({
-  declarations: [AppComponent, VaultComponent, AuthRequiredComponent],
+  declarations: [AppComponent, VaultComponent, AuthRequiredComponent,RegisterComponent,
+    LoginComponent,
+    MasterPasswordComponent,
+    ForgotPasswordComponent],
   imports: [BrowserModule, ReactiveFormsModule, FormsModule, HttpClientModule, AppRoutingModule],
   providers: [
     {
@@ -19,6 +27,5 @@ import { AuthTokenInterceptor } from './interceptors/auth-token.interceptor';
       multi: true
     }
   ],
-  bootstrap: [AppComponent]
 })
 export class AppModule {}

@@ -6,17 +6,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.passwordmanager</groupId>
-    <artifactId>vault</artifactId>
+    <artifactId>password-manager</artifactId>
     <version>1.0.0</version>
-    <packaging>jar</packaging>
-
-    <name>Vault Module</name>
-    <description>Password Vault Management Module</description>
+    <name>Password Manager</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
+        <relativePath/>
     </parent>
 
     <properties>
@@ -38,6 +36,7 @@
         </dependency>
 
         <!-- Security (for master password re-verification) -->
+        <!-- Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -73,6 +72,8 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/Java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
