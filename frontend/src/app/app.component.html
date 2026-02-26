@@ -3,8 +3,16 @@
 <main class="shell">
   <aside class="sidebar">
     <h1>Password Manager</h1>
-    <a routerLink="/generator" routerLinkActive="active">Generator</a>
-    <a routerLink="/audit" routerLinkActive="active">Security Audit</a>
+    <nav class="nav-links">
+      <a routerLink="/generator" routerLinkActive="active">Generator</a>
+      <a routerLink="/audit" routerLinkActive="active">Security Audit</a>
+      <a routerLink="/vault" routerLinkActive="active">Vault</a>
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a routerLink="/register" routerLinkActive="active">Register</a>
+      <a routerLink="/forgot-password" routerLinkActive="active">Forgot Password</a>
+      <a *ngIf="authService.isAuthenticated()" routerLink="/master-password" routerLinkActive="active">Master Password</a>
+      <button type="button" *ngIf="authService.isAuthenticated()" (click)="logout()">Logout</button>
+    </nav>
   </aside>
 
   <section class="content">

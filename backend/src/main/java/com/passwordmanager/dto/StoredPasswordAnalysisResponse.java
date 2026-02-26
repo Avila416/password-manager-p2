@@ -11,6 +11,7 @@ public class StoredPasswordAnalysisResponse {
 
     private Long entryId;
     private String username;
+    private String website;
     private String strength;
     private boolean weak;
     private boolean reused;

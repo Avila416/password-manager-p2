@@ -43,19 +43,15 @@ export class GeneratorComponent {
   }
 
   generate(): void {
-    if (this.form.invalid) {
-      this.notifications.show({ type: 'warning', text: 'Please fix generation settings.' });
+    const validationMessage = this.validateGenerationSettings();
+    if (validationMessage) {
+      this.notifications.show({ type: 'warning', text: validationMessage });
       return;
     }
 
     const values = this.form.getRawValue();
     if (values.length === null || values.count === null) {
       this.notifications.show({ type: 'warning', text: 'Enter password length and count.' });
-      return;
-    }
-
-    if (!values.uppercase && !values.lowercase && !values.numbers && !values.specialChars) {
-      this.notifications.show({ type: 'warning', text: 'Select at least one checkbox to include characters.' });
       return;
     }
 
@@ -130,6 +126,43 @@ export class GeneratorComponent {
     }
   }
 
+  get lengthError(): string {
+    const control = this.form.controls.length;
+    if (!control.touched && !control.dirty) {
+      return '';
+    }
+    if (control.hasError('required')) {
+      return 'Password length is required.';
+    }
+    if (control.hasError('min') || control.hasError('max')) {
+      return 'Use length between 8 and 64.';
+    }
+    return '';
+  }
+
+  get countError(): string {
+    const control = this.form.controls.count;
+    if (!control.touched && !control.dirty) {
+      return '';
+    }
+    if (control.hasError('required')) {
+      return 'Number of passwords is required.';
+    }
+    if (control.hasError('min') || control.hasError('max')) {
+      return 'Use count between 1 and 20.';
+    }
+    return '';
+  }
+
+  get charSetError(): string {
+    const values = this.form.getRawValue();
+    if (this.form.pristine) {
+      return '';
+    }
+    const valid = !!values.uppercase || !!values.lowercase || !!values.numbers || !!values.specialChars;
+    return valid ? '' : 'Select at least one character set.';
+  }
+
   private matchesSelectedConditions(password: string): boolean {
     const values = this.form.getRawValue();
     const targetLength = values.length ?? 0;
@@ -164,5 +197,29 @@ export class GeneratorComponent {
     document.execCommand('copy');
     document.body.removeChild(input);
     this.notifications.show({ type: 'info', text: 'Password copied to clipboard.' });
+  }
+
+  private validateGenerationSettings(): string | null {
+    const values = this.form.getRawValue();
+
+    if (values.length === null || Number.isNaN(values.length)) {
+      return 'Enter password length.';
+    }
+    if (values.length < 8 || values.length > 64) {
+      return 'Change password length: use 8 to 64 characters.';
+    }
+
+    if (values.count === null || Number.isNaN(values.count)) {
+      return 'Enter number of passwords to generate.';
+    }
+    if (values.count < 1 || values.count > 20) {
+      return 'Number of passwords must be between 1 and 20.';
+    }
+
+    if (!values.uppercase && !values.lowercase && !values.numbers && !values.specialChars) {
+      return 'Select at least one character set (uppercase, lowercase, numbers, special chars).';
+    }
+
+    return null;
   }
 }

@@ -22,5 +22,9 @@ public class PasswordEntry {
     // for audit module we just store plain for now
     private String encryptedPassword;
 
+    private String website;
+
+    private Boolean favorite;
+
     private LocalDateTime createdAt;
 }

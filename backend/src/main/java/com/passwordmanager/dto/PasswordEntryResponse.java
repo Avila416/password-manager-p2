@@ -13,5 +13,6 @@ public class PasswordEntryResponse {
     private String username;
     private String password;
     private String strength;
+    private Boolean favorite;
     private LocalDateTime createdAt;
 }

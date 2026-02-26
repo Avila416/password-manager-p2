@@ -16,6 +16,7 @@ import {
 })
 export class GeneratorApiService {
   private readonly baseUrl = 'http://localhost:8084/api/generator';
+  private readonly vaultUrl = 'http://localhost:8084/api/vault';
 
   constructor(private readonly http: HttpClient) {}
 
@@ -36,10 +37,10 @@ export class GeneratorApiService {
   }
 
   savePassword(payload: SavePasswordRequest): Observable<PasswordEntryResponse> {
-    return this.http.post<PasswordEntryResponse>(`${this.baseUrl}/vault/passwords`, payload);
+    return this.http.post<PasswordEntryResponse>(this.vaultUrl, payload);
   }
 
   getVaultPasswords(): Observable<PasswordEntryResponse[]> {
-    return this.http.get<PasswordEntryResponse[]>(`${this.baseUrl}/vault/passwords`);
+    return this.http.get<PasswordEntryResponse[]>(this.vaultUrl);
   }
 }

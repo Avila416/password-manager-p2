@@ -35,6 +35,7 @@
           <tr>
             <th>Created At</th>
             <th>Username</th>
+            <th>Website</th>
             <th>Strength</th>
             <th>Risks</th>
           </tr>
@@ -43,6 +44,7 @@
           <tr *ngFor="let row of analysis">
             <td>{{ row.createdAt | date:'short' }}</td>
             <td>{{ row.username || '-' }}</td>
+            <td>{{ row.website || '-' }}</td>
             <td>{{ row.strength }}</td>
             <td>
               <span class="tag" *ngFor="let tag of riskTags(row)">{{ tag }}</span>

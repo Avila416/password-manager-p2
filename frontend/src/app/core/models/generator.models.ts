@@ -47,6 +47,7 @@ export interface AlertResponse {
 export interface StoredPasswordAnalysisResponse {
   entryId: number;
   username: string;
+  website?: string;
   strength: 'WEAK' | 'MEDIUM' | 'STRONG' | 'VERY_STRONG';
   weak: boolean;
   reused: boolean;

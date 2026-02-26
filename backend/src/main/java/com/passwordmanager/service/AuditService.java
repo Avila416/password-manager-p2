@@ -10,13 +10,17 @@ import com.passwordmanager.exception.OperationFailedException;
 import com.passwordmanager.repository.AuditReportRepository;
 import com.passwordmanager.repository.PasswordEntryRepository;
 import com.passwordmanager.repository.SecurityAlertRepository;
+import com.passwordmanager.security.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class AuditService {
     private final SecurityAlertRepository alertRepo;
     private final AuditReportRepository auditReportRepository;
     private final PasswordStrengthService strengthService;
+    private final EncryptionUtil encryptionUtil;
 
     public AuditResponse generateAudit() {
         List<PasswordEntry> list = repo.findAllByOrderByCreatedAtDesc();
@@ -58,6 +63,7 @@ public class AuditService {
         int old = 0;
         int alertsCreated = 0;
         Map<String, Integer> passwordUseMap = new HashMap<>();
+        Map<String, List<PasswordEntry>> passwordEntriesMap = new HashMap<>();
 
         try {
             for (PasswordEntry entry : list) {
@@ -73,6 +79,7 @@ public class AuditService {
 
                 if (!password.isBlank()) {
                     passwordUseMap.put(password, passwordUseMap.getOrDefault(password, 0) + 1);
+                    passwordEntriesMap.computeIfAbsent(password, k -> new ArrayList<>()).add(entry);
                 }
 
                 if (entry.getCreatedAt() != null &&
@@ -88,7 +95,12 @@ public class AuditService {
                 int count = mapEntry.getValue();
                 if (count > 1) {
                     reused += count;
-                    if (saveAlert("Reused password detected (" + count + " occurrences)", "REUSED", "HIGH")) {
+                    String usageDetails = usageDetails(passwordEntriesMap.getOrDefault(mapEntry.getKey(), List.of()));
+                    String message = "Reused password detected (" + count + " occurrences)";
+                    if (!usageDetails.isBlank()) {
+                        message += ". Used by: " + usageDetails;
+                    }
+                    if (saveAlert(message, "REUSED", "HIGH")) {
                         alertsCreated++;
                     }
                 }
@@ -163,6 +175,7 @@ public class AuditService {
         return StoredPasswordAnalysisResponse.builder()
                 .entryId(entry.getId())
                 .username(entry.getUsername())
+                .website(entry.getWebsite())
                 .strength(strength)
                 .weak(isWeak)
                 .reused(isReused)
@@ -182,14 +195,45 @@ public class AuditService {
     }
 
     private String passwordOf(PasswordEntry entry) {
-        return entry.getEncryptedPassword() == null ? "" : entry.getEncryptedPassword();
+        if (entry.getEncryptedPassword() == null || entry.getEncryptedPassword().isBlank()) {
+            return "";
+        }
+        return encryptionUtil.decrypt(entry.getEncryptedPassword());
     }
 
     private String safeLabel(PasswordEntry entry) {
-        if (entry.getUsername() != null && !entry.getUsername().isBlank()) {
-            return entry.getUsername();
+        String username = entry.getUsername() == null ? "" : entry.getUsername().trim();
+        String website = entry.getWebsite() == null ? "" : entry.getWebsite().trim();
+
+        if (!username.isBlank() && !website.isBlank()) {
+            return username + " @ " + website;
+        }
+        if (!username.isBlank()) {
+            return username;
+        }
+        if (!website.isBlank()) {
+            return website;
         }
         return "entry#" + entry.getId();
+    }
+
+    private String usageDetails(List<PasswordEntry> entries) {
+        Set<String> labels = new LinkedHashSet<>();
+        for (PasswordEntry entry : entries) {
+            labels.add(safeLabel(entry));
+        }
+
+        if (labels.isEmpty()) {
+            return "";
+        }
+
+        List<String> list = new ArrayList<>(labels);
+        int limit = Math.min(5, list.size());
+        String joined = String.join(", ", list.subList(0, limit));
+        if (list.size() > limit) {
+            joined += " +" + (list.size() - limit) + " more";
+        }
+        return joined;
     }
 
     private boolean saveAlert(String msg, String type, String severity) {

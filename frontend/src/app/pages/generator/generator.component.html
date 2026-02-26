@@ -10,9 +10,11 @@
 
       <label>Password Length</label>
       <input type="number" formControlName="length" min="8" max="64" placeholder="Type length (8-64)" />
+      <p class="field-error" *ngIf="lengthError">{{ lengthError }}</p>
 
       <label>Number of Passwords</label>
       <input type="number" formControlName="count" min="1" max="20" placeholder="Type count (1-20)" />
+      <p class="field-error" *ngIf="countError">{{ countError }}</p>
 
       <p class="help">Checkboxes decide which character sets are included in the password.</p>
       <div class="checks">
@@ -22,6 +24,7 @@
         <label><input type="checkbox" formControlName="specialChars" /> Special chars</label>
         <!-- <label><input type="checkbox" formControlName="excludeSimilar" /> Exclude similar (0/O/1/l/I)</label> -->
       </div>
+      <p class="field-error" *ngIf="charSetError">{{ charSetError }}</p>
 
       <button type="submit" [disabled]="isGenerating">
         {{ isGenerating ? 'Generating...' : 'Generate Passwords' }}

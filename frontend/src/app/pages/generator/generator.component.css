@@ -54,6 +54,12 @@ input[type='number'] {
   color: #4a5568;
 }
 
+.field-error {
+  margin: 6px 0 0;
+  color: #b32727;
+  font-size: 13px;
+}
+
 button {
   margin-top: 14px;
   padding: 10px 12px;

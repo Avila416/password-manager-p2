@@ -9,5 +9,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
 
     List<PasswordEntry> findAllByOrderByCreatedAtDesc();
 
+    List<PasswordEntry> findAllByFavoriteTrueOrderByCreatedAtDesc();
+
     long deleteByUsername(String username);
 }
