@@ -1,0 +1,96 @@
+<div class="page">
+  <header class="topbar">
+    <h1>Password Vault</h1>
+    <div class="view-switch">
+      <button type="button" [class.active]="viewMode==='grid'" (click)="viewMode='grid'">Grid</button>
+      <button type="button" [class.active]="viewMode==='list'" (click)="viewMode='list'">List</button>
+    </div>
+  </header>
+
+  <section class="panel">
+    <h2>{{ editingId ? 'Update Entry' : 'Add Entry' }}</h2>
+    <form [formGroup]="entryForm" (ngSubmit)="saveEntry()" class="entry-form">
+      <input type="text" formControlName="title" placeholder="Title" />
+      <input type="text" formControlName="username" placeholder="Username / Email" />
+      <input type="text" formControlName="website" placeholder="Website" />
+      <select formControlName="category">
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+      <input type="text" formControlName="password" [placeholder]="editingId ? 'New password (optional)' : 'Password'" />
+      <div class="actions">
+        <button type="submit">{{ editingId ? 'Update' : 'Add' }}</button>
+        <button type="button" class="ghost" (click)="resetForm()">Clear</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel search-panel">
+    <h2>Search / Filter / Sort</h2>
+    <form [formGroup]="searchForm" (ngSubmit)="search()" class="search-form">
+      <input type="text" formControlName="keyword" placeholder="Keyword" />
+      <select formControlName="category">
+        <option value="">All categories</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+      <select formControlName="sortBy">
+        <option value="title">Sort by title</option>
+        <option value="createdAt">Sort by date</option>
+      </select>
+      <select formControlName="direction">
+        <option value="asc">Asc</option>
+        <option value="desc">Desc</option>
+      </select>
+      <div class="actions">
+        <button type="submit">Apply</button>
+        <button type="button" class="ghost" (click)="clearSearch()">Reset</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="messages" *ngIf="error || success">
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="success">{{ success }}</p>
+  </section>
+
+  <section class="tabs">
+    <button type="button" [class.active]="activeTab==='all'" (click)="activeTab='all'">All Entries</button>
+    <button type="button" [class.active]="activeTab==='favorites'" (click)="activeTab='favorites'">Favorites</button>
+  </section>
+
+  <section class="vault" *ngIf="!loading">
+    <div [class.grid]="viewMode==='grid'" [class.list]="viewMode==='list'">
+      <article class="card" *ngFor="let entry of (activeTab==='all' ? entries : favorites)">
+        <h3>{{ entry.title || '(No title)' }}</h3>
+        <p><strong>User:</strong> {{ entry.username }}</p>
+        <p><strong>Website:</strong> {{ entry.website }}</p>
+        <p><strong>Category:</strong> {{ entry.category }}</p>
+        <p><strong>Stored:</strong> {{ entry.password }}</p>
+        <p><strong>Created:</strong> {{ entry.createdAt | date:'medium' }}</p>
+        <div class="card-actions">
+          <button type="button" (click)="editEntry(entry)">Edit</button>
+          <button type="button" (click)="openVerify(entry)">Verify & Reveal</button>
+          <button type="button" (click)="markFavorite(entry)">Favorite</button>
+          <button type="button" class="danger" (click)="removeEntry(entry)">Delete</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="modal" *ngIf="selectedEntry">
+    <div class="modal-content">
+      <h3>Verify Master Password</h3>
+      <p>Entry: {{ selectedEntry.title }}</p>
+      <input
+        type="password"
+        [(ngModel)]="verifyMasterPassword"
+        placeholder="Master password"
+        name="verifyMasterPassword"
+      />
+      <div class="actions">
+        <button type="button" (click)="verifyAndReveal()">Verify</button>
+        <button type="button" class="ghost" (click)="closeVerify()">Close</button>
+      </div>
+      <p *ngIf="revealedPassword"><strong>Decrypted Password:</strong> {{ revealedPassword }}</p>
+    </div>
+  </section>
+</div>
