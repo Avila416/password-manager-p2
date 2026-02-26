@@ -1,0 +1,13 @@
+<section class="auth-required">
+  <h2>Authentication Required</h2>
+  <p>You need a valid token from Module 1 login to use Module 4.</p>
+  <ol>
+    <li>Login in Module 1 frontend on <code>http://localhost:4200/login</code>.</li>
+    <li>Ensure token is stored in local storage key <code>pm_token</code> (or token/access_token).</li>
+    <li>Return to <a routerLink="/console">Console</a>.</li>
+  </ol>
+  <p>
+    For local review/demo:
+    <button type="button" (click)="useDemoAccess()">Use Demo Access</button>
+  </p>
+</section>

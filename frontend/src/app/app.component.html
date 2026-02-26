@@ -1,1 +1,12 @@
-<app-register></app-register>
+<main class="shell">
+  <aside class="sidebar">
+    <h1>Password Manager</h1>
+    <nav class="sidebar-nav">
+      <a routerLink="/console" routerLinkActive="active">Console</a>
+      <a href="http://localhost:4200/login" target="_blank" rel="noreferrer">Auth Login</a>
+    </nav>
+  </aside>
+  <section class="content">
+    <router-outlet></router-outlet>
+  </section>
+</main>

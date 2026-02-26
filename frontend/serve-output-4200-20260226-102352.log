@@ -1,0 +1,687 @@
+- Generating browser application bundles (phase: setup)...
+√ Browser application bundle generation complete.
+
+Initial Chunk Files   | Names         |  Raw Size
+vendor.js             | vendor        |   2.56 MB |
+polyfills.js          | polyfills     | 252.54 kB |
+styles.css, styles.js | styles        | 151.01 kB |
+main.js               | main          |  70.60 kB |
+runtime.js            | runtime       |   6.49 kB |
+
+| Initial Total |   3.03 MB
+
+Build at: 2026-02-26T04:54:12.500Z - Hash: 9acbb427a0c65834 - Time: 10953ms
+
+** Angular Live Development Server is listening on localhost:4200, open your browser on http://localhost:4200/ **
+
+
+√ Compiled successfully.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 71.00 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T05:40:47.266Z - Hash: c208a451da74a16c - Time: 8236ms
+
+√ Compiled successfully.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 73.78 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T05:40:53.752Z - Hash: bdd70d373f3caa81 - Time: 3444ms
+
+√ Compiled successfully.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 72.45 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T07:35:24.848Z - Hash: ba1da3516e586e27 - Time: 5662ms
+
+./src/app/app-routing.module.ts:4:0-66 - Error: Module not found: Error: Can't resolve './core/guards/module-auth.guard' in 'C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app'
+
+Error: src/app/app-routing.module.ts:5:33 - error TS2307: Cannot find module './core/guards/module-auth.guard' or its corresponding type declarations.
+
+5 import { ModuleAuthGuard } from './core/guards/module-auth.guard';
+                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+× Failed to compile.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 73.11 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T07:35:42.486Z - Hash: 8f5884fc6478e9e4 - Time: 645ms
+
+./src/app/core/guards/module-auth.guard.ts - Error: Module build failed (from ./node_modules/@ngtools/webpack/src/ivy/index.js):
+Error: C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app\core\guards\module-auth.guard.ts is missing from the TypeScript compilation. Please make sure it is in your tsconfig via the 'files' or 'include' property.
+
+Error: src/app/app-routing.module.ts:5:33 - error TS2307: Cannot find module './core/guards/module-auth.guard' or its corresponding type declarations.
+
+5 import { ModuleAuthGuard } from './core/guards/module-auth.guard';
+                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+× Failed to compile.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 73.41 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T07:36:23.136Z - Hash: 51703bc2e2329b4e - Time: 1519ms
+
+./src/app/app.module.ts:8:0-82 - Error: Module not found: Error: Can't resolve './core/interceptors/auth-token.interceptor' in 'C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app'
+
+Error: src/app/app.module.ts:10:38 - error TS2307: Cannot find module './core/interceptors/auth-token.interceptor' or its corresponding type declarations.
+
+10 import { AuthTokenInterceptor } from './core/interceptors/auth-token.interceptor';
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+× Failed to compile.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 74.14 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T07:36:47.629Z - Hash: e4983f8b2b6df97f - Time: 1017ms
+
+./src/app/core/interceptors/auth-token.interceptor.ts - Error: Module build failed (from ./node_modules/@ngtools/webpack/src/ivy/index.js):
+Error: C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app\core\interceptors\auth-token.interceptor.ts is missing from the TypeScript compilation. Please make sure it is in your tsconfig via the 'files' or 'include' property.
+
+Error: src/app/app.module.ts:10:38 - error TS2307: Cannot find module './core/interceptors/auth-token.interceptor' or its corresponding type declarations.
+
+10 import { AuthTokenInterceptor } from './core/interceptors/auth-token.interceptor';
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+× Failed to compile.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 68.14 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T07:37:09.714Z - Hash: ee7379a85523f18a - Time: 2110ms
+
+./src/app/app-routing.module.ts:3:0-86 - Error: Module not found: Error: Can't resolve './pages/auth-required/auth-required.component' in 'C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app'
+
+./src/app/app.module.ts:9:0-86 - Error: Module not found: Error: Can't resolve './pages/auth-required/auth-required.component' in 'C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app'
+
+Error: src/app/app-routing.module.ts:4:39 - error TS2307: Cannot find module './pages/auth-required/auth-required.component' or its corresponding type declarations.
+
+4 import { AuthRequiredComponent } from './pages/auth-required/auth-required.component';
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/app.component.html:9:3 - error NG8001: 'router-outlet' is not a known element:
+1. If 'router-outlet' is an Angular component, then verify that it is part of this module.
+2. If 'router-outlet' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
+
+9   <router-outlet></router-outlet>
+    ~~~~~~~~~~~~~~~
+
+  src/app/app.component.ts:5:16
+    5   templateUrl: './app.component.html',
+                     ~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component AppComponent.
+
+
+Error: src/app/app.module.ts:9:39 - error TS2307: Cannot find module './pages/auth-required/auth-required.component' or its corresponding type declarations.
+
+9 import { AuthRequiredComponent } from './pages/auth-required/auth-required.component';
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/app.module.ts:13:17 - error NG1010: Value
+
+Error: src/app/pages/console/console.component.html:17:23 - error TS2531: Object is possibly 'null'.
+
+17       <p>{{ dashboard.totalPasswords }}</p>
+                         ~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:21:23 - error TS2531: Object is possibly 'null'.
+
+21       <p>{{ dashboard.weakPasswords }}</p>
+                         ~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:25:23 - error TS2531: Object is possibly 'null'.
+
+25       <p>{{ dashboard.recentPasswords }}</p>
+                         ~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:43:43 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+43           <input type="text" name="title" [(ngModel)]="newEntry.title" />
+                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:43:56 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+43           <input type="text" name="title" [(ngModel)]="newEntry.title" />
+                                                          ~~~~~~~~~~~~~~~~~~
+44         </label>
+   ~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:47:46 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+47           <input type="text" name="username" [(ngModel)]="newEntry.username" />
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:47:59 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+47           <input type="text" name="username" [(ngModel)]="newEntry.username" />
+                                                             ~~~~~~~~~~~~~~~~~~~~~
+48         </label>
+   ~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:51:46 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+51           <input type="text" name="password" [(ngModel)]="newEntry.password" />
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:51:59 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+51           <input type="text" name="password" [(ngModel)]="newEntry.password" />
+                                                             ~~~~~~~~~~~~~~~~~~~~~
+52         </label>
+   ~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:77:38 - error NG8004: No pipe found with name 'date'.
+
+77             <td>{{ entry.createdAt | date: 'medium' }}</td>
+                                        ~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:105:19 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'textarea'.
+
+105         <textarea [(ngModel)]="backupContent" name="backupContent" rows="7"></textarea>
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:105:32 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+105         <textarea [(ngModel)]="backupContent" name="backupContent" rows="7"></textarea>
+                                   ~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:110:59 - error TS2531: Object is possibly 'null'.
+
+110           Latest backup file: <strong>{{ latestBackupInfo.fileName }}</strong><br />
+                                                              ~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:111:43 - error TS2531: Object is possibly 'null'.
+
+111           Path: <code>{{ latestBackupInfo.filePath }}</code>
+                                              ~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:122:64 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+122         <input type="text" placeholder="Action (e.g., delete)" [(ngModel)]="auditFilter.action" name="actionFilter" />
+                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:122:77 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+122         <input type="text" placeholder="Action (e.g., delete)" [(ngModel)]="auditFilter.action" name="actionFilter" />
+                                                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:123:62 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+123         <input type="text" placeholder="Status (e.g., fail)" [(ngModel)]="auditFilter.status" name="statusFilter" />
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:123:75 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+123         <input type="text" placeholder="Status (e.g., fail)" [(ngModel)]="auditFilter.status" name="statusFilter" />
+                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:124:56 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+124         <input type="text" placeholder="IP (optional)" [(ngModel)]="auditFilter.ip" name="ipFilter" />
+                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:124:69 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+124         <input type="text" placeholder="IP (optional)" [(ngModel)]="auditFilter.ip" name="ipFilter" />
+                                                                        ~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:143:33 - error NG8004: No pipe found with name 'date'.
+
+143               <td>{{ log.time | date: 'medium' }}</td>
+                                    ~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+
+
+× Failed to compile.
+√ Browser application bundle generation complete.
+
+Initial Chunk Files | Names   | Raw Size
+main.js             | main    | 68.82 kB |
+runtime.js          | runtime |  6.49 kB |
+
+3 unchanged chunks
+
+Build at: 2026-02-26T07:37:47.138Z - Hash: c161415fec2cf204 - Time: 1815ms
+
+./src/app/pages/auth-required/auth-required.component.ts - Error: Module build failed (from ./node_modules/@ngtools/webpack/src/ivy/index.js):
+Error: C:\Users\DELL\Downloads\module4_updated_20260225_mvp\frontend\src\app\pages\auth-required\auth-required.component.ts is missing from the TypeScript compilation. Please make sure it is in your tsconfig via the 'files' or 'include' property.
+
+Error: src/app/app-routing.module.ts:4:39 - error TS2307: Cannot find module './pages/auth-required/auth-required.component' or its corresponding type declarations.
+
+4 import { AuthRequiredComponent } from './pages/auth-required/auth-required.component';
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/app.component.html:9:3 - error NG8001: 'router-outlet' is not a known element:
+1. If 'router-outlet' is an Angular component, then verify that it is part of this module.
+2. If 'router-outlet' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
+
+9   <router-outlet></router-outlet>
+    ~~~~~~~~~~~~~~~
+
+  src/app/app.component.ts:5:16
+    5   templateUrl: './app.component.html',
+                     ~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component AppComponent.
+
+
+Error: src/app/app.module.ts:9:39 - error TS2307: Cannot find module './pages/auth-required/auth-required.component' or its corresponding type declarations.
+
+9 import { AuthRequiredComponent } from './pages/auth-required/auth-required.component';
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/app.module.ts:13:17 - error NG1010: Value
+
+Error: src/app/pages/console/console.component.html:17:23 - error TS2531: Object is possibly 'null'.
+
+17       <p>{{ dashboard.totalPasswords }}</p>
+                         ~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:21:23 - error TS2531: Object is possibly 'null'.
+
+21       <p>{{ dashboard.weakPasswords }}</p>
+                         ~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:25:23 - error TS2531: Object is possibly 'null'.
+
+25       <p>{{ dashboard.recentPasswords }}</p>
+                         ~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:43:43 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+43           <input type="text" name="title" [(ngModel)]="newEntry.title" />
+                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:43:56 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+43           <input type="text" name="title" [(ngModel)]="newEntry.title" />
+                                                          ~~~~~~~~~~~~~~~~~~
+44         </label>
+   ~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:47:46 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+47           <input type="text" name="username" [(ngModel)]="newEntry.username" />
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:47:59 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+47           <input type="text" name="username" [(ngModel)]="newEntry.username" />
+                                                             ~~~~~~~~~~~~~~~~~~~~~
+48         </label>
+   ~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:51:46 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+51           <input type="text" name="password" [(ngModel)]="newEntry.password" />
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:51:59 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+51           <input type="text" name="password" [(ngModel)]="newEntry.password" />
+                                                             ~~~~~~~~~~~~~~~~~~~~~
+52         </label>
+   ~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:77:38 - error NG8004: No pipe found with name 'date'.
+
+77             <td>{{ entry.createdAt | date: 'medium' }}</td>
+                                        ~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:105:19 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'textarea'.
+
+105         <textarea [(ngModel)]="backupContent" name="backupContent" rows="7"></textarea>
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:105:32 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+105         <textarea [(ngModel)]="backupContent" name="backupContent" rows="7"></textarea>
+                                   ~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:110:59 - error TS2531: Object is possibly 'null'.
+
+110           Latest backup file: <strong>{{ latestBackupInfo.fileName }}</strong><br />
+                                                              ~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:111:43 - error TS2531: Object is possibly 'null'.
+
+111           Path: <code>{{ latestBackupInfo.filePath }}</code>
+                                              ~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:122:64 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+122         <input type="text" placeholder="Action (e.g., delete)" [(ngModel)]="auditFilter.action" name="actionFilter" />
+                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:122:77 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+122         <input type="text" placeholder="Action (e.g., delete)" [(ngModel)]="auditFilter.action" name="actionFilter" />
+                                                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:123:62 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+123         <input type="text" placeholder="Status (e.g., fail)" [(ngModel)]="auditFilter.status" name="statusFilter" />
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:123:75 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+123         <input type="text" placeholder="Status (e.g., fail)" [(ngModel)]="auditFilter.status" name="statusFilter" />
+                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:124:56 - error NG8002: Can't bind to 'ngModel' since it isn't a known property of 'input'.
+
+124         <input type="text" placeholder="IP (optional)" [(ngModel)]="auditFilter.ip" name="ipFilter" />
+                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:124:69 - error TS2322: Type 'Event' is not assignable to type 'string'.
+
+124         <input type="text" placeholder="IP (optional)" [(ngModel)]="auditFilter.ip" name="ipFilter" />
+                                                                        ~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+Error: src/app/pages/console/console.component.html:143:33 - error NG8004: No pipe found with name 'date'.
+
+143               <td>{{ log.time | date: 'medium' }}</td>
+                                    ~~~~
+
+  src/app/pages/console/console.component.ts:35:16
+    35   templateUrl: './console.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component ConsoleComponent.
+
+
+
+
+× Failed to compile.
