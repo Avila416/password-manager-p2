@@ -49,5 +49,14 @@ button:hover {
   background: #223f8a;
 }
 
-.ok { color: #186a30; }
+a {
+  color: #214ea8;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .err { color: #a12727; }
+.ok { color: #186a30; }
