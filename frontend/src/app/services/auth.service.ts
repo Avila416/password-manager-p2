@@ -19,7 +19,7 @@ export interface UserProfile {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly baseUrl = 'http://localhost:8082/auth';
+  private readonly baseUrl = 'http://localhost:8084/auth';
   private readonly tokenKey = 'pm_token';
   private readonly legacyTokenKey = 'token';
 
@@ -53,6 +53,19 @@ export class AuthService {
     confirmPassword: string;
   }): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.baseUrl}/password/forgot/reset`, payload);
+  }
+
+  requestForgotMasterPasswordCode(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/master-password/forgot/request`, { email });
+  }
+
+  resetForgotMasterPassword(payload: {
+    email: string;
+    verificationCode: string;
+    newMasterPassword: string;
+    confirmMasterPassword: string;
+  }): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/master-password/forgot/reset`, payload);
   }
 
   logout(): Observable<{ message: string }> {

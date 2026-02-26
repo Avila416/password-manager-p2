@@ -154,3 +154,16 @@ button.danger {
   padding: 16px;
   width: min(430px, 100%);
 }
+
+.pin-row {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.pin-box {
+  width: 52px;
+  height: 52px;
+  text-align: center;
+  font-size: 1.4rem;
+}

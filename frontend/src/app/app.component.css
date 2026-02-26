@@ -1,4 +1,4 @@
-﻿:host {
+:host {
   display: block;
 }
 
@@ -6,110 +6,56 @@
   box-sizing: border-box;
 }
 
-.app-shell {
+.shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 250px 1fr;
   background: #e8edf3;
 }
 
 .sidebar {
   background: #163c70;
-  color: #ffffff;
-  padding: 28px 20px;
+  color: #fff;
+  padding: 24px 16px;
 }
 
 .sidebar h1 {
-  margin: 0 0 24px;
-  font-size: 2rem;
-  letter-spacing: 0.2px;
+  margin: 0 0 16px;
+  font-size: 1.9rem;
 }
 
-.sidebar nav {
+.nav-links {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
-.sidebar a {
+.sidebar a,
+.sidebar button {
   display: block;
   text-decoration: none;
   color: #d7e6fb;
-  font-size: 1.05rem;
-  padding: 10px 12px;
-  border-radius: 8px;
-  transition: background-color 160ms ease, color 160ms ease;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
 }
 
 .sidebar a:hover,
-.sidebar a.active {
+.sidebar a.active,
+.sidebar button:hover {
   background: #2f67a8;
-  color: #ffffff;
+  color: #fff;
 }
 
-.content-area {
+.content {
   padding: 20px;
 }
 
 @media (max-width: 900px) {
-  .app-shell {
+  .shell {
     grid-template-columns: 1fr;
   }
-
-  .sidebar {
-    padding: 18px 16px;
-  }
-
-  .sidebar h1 {
-    font-size: 1.6rem;
-    margin-bottom: 14px;
-  }
-﻿.layout {
-  min-height: 100vh;
-  background: linear-gradient(140deg, #f1f6ff 0%, #eef4ff 45%, #f7fbff 100%);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 24px;
-  border-bottom: 1px solid #1d4ea3;
-  background: linear-gradient(90deg, #1f4aa5, #2f63c6);
-}
-
-.topbar h1 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #ffffff;
-}
-
-.topbar nav {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.topbar a,
-.topbar button {
-  color: #21427f;
-  text-decoration: none;
-  font-size: 0.92rem;
-  border: 1px solid #b7cdf8;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: #eef4ff;
-  cursor: pointer;
-}
-
-.topbar a:hover,
-.topbar button:hover {
-  background: #dce9ff;
-}
-
-.content {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 24px 16px 40px;
-}
 }

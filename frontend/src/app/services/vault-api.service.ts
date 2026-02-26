@@ -1,29 +1,81 @@
-﻿import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { SearchPayload, VaultEntry, VaultEntryPayload } from '../models/vault.models';
 
 @Injectable({ providedIn: 'root' })
 export class VaultApiService {
-  private readonly baseUrl = 'http://localhost:8083/api/vault';
+  private readonly baseUrl = 'http://localhost:8084/api/vault';
 
   constructor(private http: HttpClient) {}
 
   getAllEntries(): Observable<VaultEntry[]> {
-    return this.http.get<VaultEntry[]>(this.baseUrl);
+    return this.http.get<any[]>(this.baseUrl).pipe(
+      map((rows) =>
+        rows.map((row) => ({
+          id: row.id,
+          title: row.title ?? '',
+          username: row.username ?? '',
+          website: row.website ?? '',
+          category: row.category ?? 'OTHER',
+          favorite: !!row.favorite,
+          createdAt: row.createdAt,
+          password: row.password ?? ''
+        } as VaultEntry))
+      )
+    );
   }
 
   addEntry(payload: VaultEntryPayload): Observable<VaultEntry> {
-    return this.http.post<VaultEntry>(this.baseUrl, payload);
+    const request = {
+      username: payload.username,
+      password: payload.password ?? '',
+      title: payload.title,
+      website: payload.website,
+      category: payload.category
+    };
+
+    return this.http.post<any>(this.baseUrl, request).pipe(
+      map((row) => ({
+        id: row.id,
+        title: row.title ?? payload.title ?? '',
+        username: row.username ?? payload.username,
+        website: row.website ?? payload.website ?? '',
+        category: row.category ?? payload.category ?? 'OTHER',
+        favorite: !!row.favorite,
+        createdAt: row.createdAt,
+        password: row.password ?? payload.password ?? ''
+      } as VaultEntry))
+    );
   }
 
   updateEntry(id: number, payload: VaultEntryPayload): Observable<VaultEntry> {
-    return this.http.put<VaultEntry>(`${this.baseUrl}/${id}`, payload);
+    const request: { username: string; website?: string; password?: string } = {
+      username: payload.username,
+      website: payload.website ?? ''
+    };
+
+    if (payload.password && payload.password.trim()) {
+      request.password = payload.password;
+    }
+
+    return this.http.put<any>(`${this.baseUrl}/${id}`, request).pipe(
+      map((row) => ({
+        id: row.id,
+        title: row.title ?? payload.title ?? '',
+        username: row.username ?? payload.username,
+        website: row.website ?? payload.website ?? '',
+        category: row.category ?? payload.category ?? 'OTHER',
+        favorite: !!row.favorite,
+        createdAt: row.createdAt,
+        password: row.password ?? payload.password ?? ''
+      } as VaultEntry))
+    );
   }
 
   deleteEntry(id: number, masterPassword: string): Observable<void> {
-    const params = new HttpParams().set('masterPassword', masterPassword);
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, { params });
+    const mp = encodeURIComponent(masterPassword);
+    return this.http.delete<void>(`${this.baseUrl}/${id}?masterPassword=${mp}`);
   }
 
   markFavorite(id: number): Observable<void> {
@@ -31,21 +83,61 @@ export class VaultApiService {
   }
 
   getFavorites(): Observable<VaultEntry[]> {
-    return this.http.get<VaultEntry[]>(`${this.baseUrl}/favorites`);
+    return this.http.get<any[]>(`${this.baseUrl}/favorites`).pipe(
+      map((rows) =>
+        rows.map((row) => ({
+          id: row.id,
+          title: row.title ?? '',
+          username: row.username ?? '',
+          website: row.website ?? '',
+          category: row.category ?? 'OTHER',
+          favorite: !!row.favorite,
+          createdAt: row.createdAt,
+          password: row.password ?? ''
+        } as VaultEntry))
+      )
+    );
   }
 
   verifyAndGet(id: number, masterPassword: string): Observable<VaultEntry> {
-    return this.http.post<VaultEntry>(`${this.baseUrl}/${id}/verify`, { masterPassword });
+    return this.http.post<any>(`${this.baseUrl}/${id}/verify`, { masterPassword }).pipe(
+      map((row) => ({
+        id: row.id,
+        title: row.title ?? '',
+        username: row.username ?? '',
+        website: row.website ?? '',
+        category: row.category ?? 'OTHER',
+        favorite: !!row.favorite,
+        createdAt: row.createdAt,
+        password: row.password ?? ''
+      } as VaultEntry))
+    );
   }
 
   searchEntries(payload: SearchPayload, sortBy?: string, direction: string = 'asc'): Observable<VaultEntry[]> {
-    let params = new HttpParams();
-    if (sortBy) {
-      params = params.set('sortBy', sortBy);
-    }
-    params = params.set('direction', direction);
+    const body = {
+      keyword: payload.keyword ?? '',
+      category: payload.category ?? ''
+    };
+    const params = new URLSearchParams();
+    if (sortBy) params.set('sortBy', sortBy);
+    if (direction) params.set('direction', direction);
 
-    return this.http.post<VaultEntry[]>(`${this.baseUrl}/search`, payload, { params });
+    return this.http
+      .post<any[]>(`${this.baseUrl}/search?${params.toString()}`, body)
+      .pipe(
+        map((rows) =>
+          rows.map((row) => ({
+            id: row.id,
+            title: row.title ?? '',
+            username: row.username ?? '',
+            website: row.website ?? '',
+            category: row.category ?? 'OTHER',
+            favorite: !!row.favorite,
+            createdAt: row.createdAt,
+            password: row.password ?? ''
+          } as VaultEntry))
+        )
+      );
   }
 }
-

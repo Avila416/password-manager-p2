@@ -1,28 +1,21 @@
-﻿<div class="app-shell">
+<app-toast></app-toast>
+
+<main class="shell">
   <aside class="sidebar">
     <h1>Password Manager</h1>
-    <nav>
+    <nav class="nav-links">
+      <a routerLink="/generator" routerLinkActive="active">Generator</a>
+      <a routerLink="/audit" routerLinkActive="active">Security Audit</a>
       <a routerLink="/vault" routerLinkActive="active">Vault</a>
-      <a href="http://localhost:4200/login" target="_blank" rel="noreferrer">Auth Login</a>
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a routerLink="/register" routerLinkActive="active">Register</a>
+      <a routerLink="/forgot-password" routerLinkActive="active">Forgot Password</a>
+      <a *ngIf="authService.isAuthenticated()" routerLink="/master-password" routerLinkActive="active">Master Password</a>
+      <button type="button" *ngIf="authService.isAuthenticated()" (click)="logout()">Logout</button>
     </nav>
   </aside>
 
-  <section class="content-area">
+  <section class="content">
     <router-outlet></router-outlet>
   </section>
-<div class="layout">
-  <header class="topbar">
-    <h1>Password Manager</h1>
-    <nav>
-      <a routerLink="/login">Login</a>
-      <a routerLink="/register">Register</a>
-      <a routerLink="/forgot-password">Forgot Password</a>
-      <a *ngIf="authService.isAuthenticated()" routerLink="/master-password">Master Password</a>
-      <button *ngIf="authService.isAuthenticated()" (click)="logout()">Logout</button>
-    </nav>
-  </header>
-
-  <main class="content">
-    <router-outlet></router-outlet>
-  </main>
-</div>
+</main>

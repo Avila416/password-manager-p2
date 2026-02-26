@@ -1,7 +1,10 @@
-﻿import { NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { GeneratorComponent } from './pages/generator/generator.component';
+import { AuditComponent } from './pages/audit/audit.component';
+import { AuthRequiredComponent } from './pages/auth-required/auth-required.component';
+import { moduleAuthGuard } from './core/guards/module-auth.guard';
 import { VaultComponent } from './vault/vault.component';
-import { AuthRequiredComponent } from './auth-required/auth-required.component';
 import { vaultGuard } from './guards/vault.guard';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
@@ -10,18 +13,19 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { authGuard } from './guards/auth.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'vault', pathMatch: 'full' },
+  { path: '', pathMatch: 'full', redirectTo: 'generator' },
+  { path: 'generator', component: GeneratorComponent, canActivate: [moduleAuthGuard] },
+  { path: 'audit', component: AuditComponent, canActivate: [moduleAuthGuard] },
   { path: 'vault', component: VaultComponent, canActivate: [vaultGuard] },
-  { path: 'auth-required', component: AuthRequiredComponent },
-  { path: '**', redirectTo: 'vault' },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'master-password', component: MasterPasswordComponent, canActivate: [authGuard] },
-  { path: '**', redirectTo: 'login' }
 
-]
+  { path: 'auth-required', component: AuthRequiredComponent },
+  { path: '**', redirectTo: 'generator' }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

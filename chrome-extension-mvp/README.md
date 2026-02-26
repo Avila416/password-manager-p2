@@ -1,7 +1,7 @@
 # Chrome Extension MVP
 
 ## Demo Flow
-1. Start Module 2 backend on `http://localhost:8083`.
+1. Start Module 2 backend on `http://localhost:8084` (or legacy `8083`).
 2. Save a vault credential with `website` set to a domain or URL (for example `example.com`).
 3. In Chrome, open `chrome://extensions`, enable Developer Mode, then `Load unpacked` this folder.
 4. Open a login page for the same domain (or `demo-login.html` as a local test).

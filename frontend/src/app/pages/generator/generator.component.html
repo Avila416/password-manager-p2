@@ -1,0 +1,63 @@
+<section class="page">
+  <header class="page-header">
+    <h2>Password Generator</h2>
+    <p>Create strong passwords, copy instantly, and save to vault.</p>
+  </header>
+
+  <div class="layout">
+    <form class="panel" [formGroup]="form" (ngSubmit)="generate()">
+      <h3>Generation Options</h3>
+
+      <label>Password Length</label>
+      <input type="number" formControlName="length" min="8" max="64" placeholder="Type length (8-64)" />
+      <p class="field-error" *ngIf="lengthError">{{ lengthError }}</p>
+
+      <label>Number of Passwords</label>
+      <input type="number" formControlName="count" min="1" max="20" placeholder="Type count (1-20)" />
+      <p class="field-error" *ngIf="countError">{{ countError }}</p>
+
+      <p class="help">Checkboxes decide which character sets are included in the password.</p>
+      <div class="checks">
+        <label><input type="checkbox" formControlName="uppercase" /> Uppercase</label>
+        <label><input type="checkbox" formControlName="lowercase" /> Lowercase</label>
+        <label><input type="checkbox" formControlName="numbers" /> Numbers</label>
+        <label><input type="checkbox" formControlName="specialChars" /> Special chars</label>
+        <!-- <label><input type="checkbox" formControlName="excludeSimilar" /> Exclude similar (0/O/1/l/I)</label> -->
+      </div>
+      <p class="field-error" *ngIf="charSetError">{{ charSetError }}</p>
+
+      <button type="submit" [disabled]="isGenerating">
+        {{ isGenerating ? 'Generating...' : 'Generate Passwords' }}
+      </button>
+    </form>
+  </div>
+
+  <section class="results panel" *ngIf="generatedPasswords.length > 0">
+    <h3>Generated Passwords</h3>
+
+    <div class="item" *ngFor="let item of generatedPasswords">
+      <div class="password">{{ item.password }}</div>
+
+      <div class="strength">
+        <span>{{ item.strength }}</span>
+        <div class="meter">
+          <div
+            class="meter-fill"
+            [style.width.%]="strengthWidth(item.password, item.strength)"
+            [class.weak]="item.strength === 'WEAK'"
+            [class.medium]="item.strength === 'MEDIUM'"
+            [class.strong]="item.strength === 'STRONG'"
+            [class.very-strong]="item.strength === 'VERY_STRONG'"
+          ></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="copy(item.password)">Copy</button>
+        <button type="button" class="secondary" [disabled]="isSaving" (click)="save(item.password)">
+          Save to Vault
+        </button>
+      </div>
+    </div>
+  </section>
+</section>

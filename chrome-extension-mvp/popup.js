@@ -1,4 +1,7 @@
-const API_BASE = "http://localhost:8083/api/vault";
+const API_BASES = [
+  "http://localhost:8084/api/vault",
+  "http://localhost:8083/api/vault"
+];
 
 async function getActiveTab() {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -20,6 +23,25 @@ function normalizeHost(url) {
   }
 }
 
+async function sendFillMessage(tabId, payload) {
+  try {
+    return await chrome.tabs.sendMessage(tabId, { type: "PM_FILL", payload });
+  } catch (err) {
+    const msg = String(err && err.message ? err.message : err);
+    if (!msg.includes("Receiving end does not exist")) {
+      throw err;
+    }
+
+    // Content script may not be attached yet; inject and retry once.
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["content.js"]
+    });
+
+    return await chrome.tabs.sendMessage(tabId, { type: "PM_FILL", payload });
+  }
+}
+
 function renderEntries(entries, tabId) {
   const wrap = document.getElementById("results");
   wrap.innerHTML = "";
@@ -38,14 +60,22 @@ function renderEntries(entries, tabId) {
     const button = document.createElement("button");
     button.textContent = "Fill";
     button.addEventListener("click", async () => {
-      await chrome.tabs.sendMessage(tabId, {
-        type: "PM_FILL",
-        payload: {
+      try {
+        const response = await sendFillMessage(tabId, {
           username: entry.username || "",
           password: entry.password || entry.encryptedPassword || ""
+        });
+
+        if (response && response.ok) {
+          setStatus("Credentials filled.");
+          window.close();
+          return;
         }
-      });
-      window.close();
+
+        setStatus("Could not find login fields on this page.", true);
+      } catch (_) {
+        setStatus("Fill failed. Reload page and try again.", true);
+      }
     });
 
     row.appendChild(label);
@@ -70,19 +100,33 @@ async function load() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/by-domain?domain=${encodeURIComponent(domain)}`);
-    if (!res.ok) {
-      setStatus(`API error ${res.status}`, true);
+    let res = null;
+    for (const base of API_BASES) {
+      try {
+        const candidate = await fetch(`${base}/by-domain?domain=${encodeURIComponent(domain)}`);
+        if (candidate.ok) {
+          res = candidate;
+          break;
+        }
+      } catch (_) {
+        // Try next base URL.
+      }
+    }
+
+    if (!res) {
+      setStatus("Cannot reach backend. Start module backend first.", true);
       return;
     }
+
     const entries = await res.json();
     if (!Array.isArray(entries) || entries.length === 0) {
       setStatus("No matching credentials found.");
       return;
     }
+
     setStatus(`Found ${entries.length} match(es).`);
     renderEntries(entries, tab.id);
-  } catch (err) {
+  } catch (_) {
     setStatus("Cannot reach backend. Start module backend first.", true);
   }
 }

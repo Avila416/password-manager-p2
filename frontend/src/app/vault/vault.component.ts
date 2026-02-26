@@ -22,15 +22,17 @@ export class VaultComponent implements OnInit {
 
   editingId: number | null = null;
   selectedEntry: VaultEntry | null = null;
+  deleteEntryTarget: VaultEntry | null = null;
   verifyMasterPassword = '';
   revealedPassword = '';
+  deleteMasterPassword = '';
 
   entryForm = this.fb.group({
-    title: ['', Validators.required],
+    title: [''],
     username: ['', Validators.required],
     password: [''],
-    website: ['', Validators.required],
-    category: ['OTHER', Validators.required]
+    website: [''],
+    category: ['OTHER']
   });
 
   searchForm = this.fb.group({
@@ -139,15 +141,31 @@ export class VaultComponent implements OnInit {
     });
   }
 
-  removeEntry(entry: VaultEntry): void {
-    const masterPassword = window.prompt('Enter master password to delete this entry:');
-    if (!masterPassword) {
+  openDeleteModal(entry: VaultEntry): void {
+    this.deleteEntryTarget = entry;
+    this.deleteMasterPassword = '';
+  }
+
+  closeDeleteModal(): void {
+    this.deleteEntryTarget = null;
+    this.deleteMasterPassword = '';
+  }
+
+  authorizeDelete(): void {
+    if (!this.deleteEntryTarget) {
       return;
     }
 
-    this.api.deleteEntry(entry.id, masterPassword).subscribe({
+    const masterPassword = this.deleteMasterPassword.trim();
+    if (!masterPassword) {
+      this.error = 'Enter master password';
+      return;
+    }
+
+    this.api.deleteEntry(this.deleteEntryTarget.id, masterPassword).subscribe({
       next: () => {
         this.success = 'Entry deleted';
+        this.closeDeleteModal();
         this.loadAllEntries();
         this.loadFavorites();
       },
@@ -207,6 +225,13 @@ export class VaultComponent implements OnInit {
     });
   }
 
+  maskPassword(password: string): string {
+    if (!password) {
+      return '';
+    }
+    return '*'.repeat(Math.max(8, password.length));
+  }
+
   private extractErrorMessage(error: unknown, fallback: string): string {
     const err = error as HttpErrorResponse | undefined;
     if (!err) {
@@ -214,7 +239,11 @@ export class VaultComponent implements OnInit {
     }
 
     if (err.status === 0) {
-      return 'Cannot connect to backend. Start Spring Boot on localhost:8083.';
+      return 'Cannot connect to backend. Start Spring Boot on localhost:8084.';
+    }
+
+    if (err.status === 401 || err.status === 403) {
+      return 'Unauthorized request. Please login again.';
     }
 
     if (typeof err.error === 'string' && err.error.trim()) {

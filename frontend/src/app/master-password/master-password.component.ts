@@ -15,6 +15,8 @@ export class MasterPasswordComponent implements OnInit {
   changeError = '';
   twoFaMessage = '';
   twoFaError = '';
+  forgotMessage = '';
+  forgotError = '';
 
   setupForm = {
     masterPassword: '',
@@ -25,6 +27,13 @@ export class MasterPasswordComponent implements OnInit {
     oldMasterPassword: '',
     newMasterPassword: '',
     confirmNewMasterPassword: ''
+  };
+
+  forgotForm = {
+    email: '',
+    verificationCode: '',
+    newMasterPassword: '',
+    confirmMasterPassword: ''
   };
 
   constructor(private authService: AuthService) {}
@@ -103,6 +112,55 @@ export class MasterPasswordComponent implements OnInit {
       },
       error: (err) => {
         this.twoFaError = this.extractError(err, 'Failed to update 2FA');
+      }
+    });
+  }
+
+  requestForgotMasterPasswordCode() {
+    this.forgotError = '';
+    this.forgotMessage = '';
+
+    if (!this.forgotForm.email) {
+      this.forgotError = 'Email is required';
+      return;
+    }
+
+    this.authService.requestForgotMasterPasswordCode(this.forgotForm.email).subscribe({
+      next: (resp) => {
+        this.forgotMessage = resp.message;
+      },
+      error: (err) => {
+        this.forgotError = this.extractError(err, 'Failed to send verification code');
+      }
+    });
+  }
+
+  resetForgotMasterPassword() {
+    this.forgotError = '';
+    this.forgotMessage = '';
+
+    if (this.forgotForm.newMasterPassword !== this.forgotForm.confirmMasterPassword) {
+      this.forgotError = 'New master password and confirm master password must match';
+      return;
+    }
+
+    this.authService.resetForgotMasterPassword({
+      email: this.forgotForm.email,
+      verificationCode: this.forgotForm.verificationCode,
+      newMasterPassword: this.forgotForm.newMasterPassword,
+      confirmMasterPassword: this.forgotForm.confirmMasterPassword
+    }).subscribe({
+      next: (resp) => {
+        this.forgotMessage = resp.message;
+        this.forgotForm = {
+          email: '',
+          verificationCode: '',
+          newMasterPassword: '',
+          confirmMasterPassword: ''
+        };
+      },
+      error: (err) => {
+        this.forgotError = this.extractError(err, 'Failed to reset master password');
       }
     });
   }

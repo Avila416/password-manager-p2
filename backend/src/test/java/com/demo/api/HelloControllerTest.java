@@ -2,9 +2,9 @@ package com.demo.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.passwordmanager.vault.VaultApplication;
+import com.passwordmanager.PasswordManagerApplication;
 
-@SpringBootTest(classes = VaultApplication.class)
+@SpringBootTest(classes = PasswordManagerApplication.class)
 public class HelloControllerTest {
 
     @Test
