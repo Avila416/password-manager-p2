@@ -50,10 +50,12 @@ export class VaultApiService {
   }
 
   updateEntry(id: number, payload: VaultEntryPayload): Observable<VaultEntry> {
-    const request: { username: string; website?: string; password?: string } = {
+    const request: { username: string; title?: string; website?: string; category?: string; password?: string } = {
       username: payload.username,
+      title: payload.title ?? '',
       website: payload.website ?? ''
     };
+    request.category = payload.category ?? 'OTHER';
 
     if (payload.password && payload.password.trim()) {
       request.password = payload.password;

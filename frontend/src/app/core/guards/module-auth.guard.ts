@@ -1,8 +1,11 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { readAuthToken } from '../auth/token.util';
 
-export const moduleAuthGuard: CanActivateFn = () => {
+export const moduleAuthGuard: CanActivateFn = (_route, state) => {
   const router = inject(Router);
-  const token = localStorage.getItem('pm_token');
-  return token ? true : router.createUrlTree(['/auth-required']);
+  const token = readAuthToken();
+  return token
+    ? true
+    : router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
 };

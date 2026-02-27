@@ -22,7 +22,7 @@
         <label><input type="checkbox" formControlName="lowercase" /> Lowercase</label>
         <label><input type="checkbox" formControlName="numbers" /> Numbers</label>
         <label><input type="checkbox" formControlName="specialChars" /> Special chars</label>
-        <!-- <label><input type="checkbox" formControlName="excludeSimilar" /> Exclude similar (0/O/1/l/I)</label> -->
+        <label><input type="checkbox" formControlName="excludeSimilar" /> Exclude similar characters (0, O, l, 1, etc.)</label>
       </div>
       <p class="field-error" *ngIf="charSetError">{{ charSetError }}</p>
 
@@ -43,7 +43,7 @@
         <div class="meter">
           <div
             class="meter-fill"
-            [style.width.%]="strengthWidth(item.password, item.strength)"
+            [style.width.%]="strengthWidth(item.strength)"
             [class.weak]="item.strength === 'WEAK'"
             [class.medium]="item.strength === 'MEDIUM'"
             [class.strong]="item.strength === 'STRONG'"
@@ -60,4 +60,35 @@
       </div>
     </div>
   </section>
+
+  <div class="dialog-backdrop" *ngIf="showSaveDialog">
+    <section class="dialog panel">
+      <h3>Save To Vault</h3>
+      <p class="help">Add details before saving this generated password.</p>
+
+      <form [formGroup]="saveForm" (ngSubmit)="confirmSave()">
+        <label for="save-title">Title</label>
+        <input id="save-title" type="text" formControlName="title" placeholder="Title (optional)" />
+
+        <label for="save-username">Username / Email</label>
+        <input id="save-username" type="text" formControlName="username" placeholder="Username or email" />
+
+        <label for="save-website">Website</label>
+        <input id="save-website" type="text" formControlName="website" placeholder="example.com" />
+        <p class="field-error" *ngIf="saveWebsiteError">{{ saveWebsiteError }}</p>
+
+        <label for="save-category">Category</label>
+        <select id="save-category" formControlName="category">
+          <option [ngValue]="null">Select category</option>
+          <option *ngFor="let category of categories" [ngValue]="category">{{ category }}</option>
+        </select>
+        <p class="field-error" *ngIf="saveCategoryError">{{ saveCategoryError }}</p>
+
+        <div class="dialog-actions">
+          <button type="button" class="secondary neutral" (click)="closeSaveDialog()" [disabled]="isSaving">Cancel</button>
+          <button type="submit" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save Password' }}</button>
+        </div>
+      </form>
+    </section>
+  </div>
 </section>

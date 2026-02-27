@@ -24,11 +24,48 @@ export class RegisterComponent {
     this.error = '';
     this.message = '';
 
+    const name = this.form.name.trim();
+    const email = this.form.email.trim();
+    const password = this.form.password.trim();
+    const phone = this.form.phone.trim();
+
+    if (!name) {
+      this.error = 'Name is required';
+      return;
+    }
+
+    if (!email) {
+      this.error = 'Email is required';
+      return;
+    }
+
+    if (!this.isValidEmail(email)) {
+      this.error = 'Enter a valid email address';
+      return;
+    }
+
+    if (!password) {
+      this.error = 'Password is required';
+      return;
+    }
+
+    if (password.length < 6) {
+      this.error = 'Password must be at least 6 characters';
+      return;
+    }
+
+    if (phone && !this.isValidPhone(phone)) {
+      this.error = 'Phone number must be exactly 10 digits';
+      return;
+    }
+
+    this.form = { name, email, password, phone };
+
     this.authService.register(this.form).subscribe({
       next: (resp) => {
-        this.authService.saveToken(resp.token);
         this.message = resp.message;
-        this.router.navigate(['/dashboard']);
+        this.authService.clearToken();
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.error = this.extractError(err);
@@ -57,4 +94,13 @@ export class RegisterComponent {
 
     return 'Registration failed';
   }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  private isValidPhone(phone: string): boolean {
+    return /^\d{10}$/.test(phone);
+  }
 }
+

@@ -66,7 +66,8 @@ public class EncryptionUtil {
                 byte[] plain = cipher.doFinal(cipherBytes);
                 return new String(plain, StandardCharsets.UTF_8);
             } catch (Exception ex) {
-                throw new IllegalStateException("Decryption failed", ex);
+                // Keep API stable for legacy/mismatched-key rows instead of failing requests.
+                return "";
             }
         }
 

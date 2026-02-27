@@ -1,12 +1,16 @@
 package com.passwordmanager.service;
 
 import com.passwordmanager.dto.AlertResponse;
+import com.passwordmanager.dto.AuditLogResponse;
 import com.passwordmanager.dto.AuditResponse;
 import com.passwordmanager.dto.StoredPasswordAnalysisResponse;
+import com.passwordmanager.entity.AuditLog;
 import com.passwordmanager.entity.AuditReport;
 import com.passwordmanager.entity.PasswordEntry;
 import com.passwordmanager.entity.SecurityAlert;
+import com.passwordmanager.exception.AuditException;
 import com.passwordmanager.exception.OperationFailedException;
+import com.passwordmanager.repository.AuditLogRepository;
 import com.passwordmanager.repository.AuditReportRepository;
 import com.passwordmanager.repository.PasswordEntryRepository;
 import com.passwordmanager.repository.SecurityAlertRepository;
@@ -16,11 +20,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +35,39 @@ public class AuditService {
     private final PasswordEntryRepository repo;
     private final SecurityAlertRepository alertRepo;
     private final AuditReportRepository auditReportRepository;
+    private final AuditLogRepository auditLogRepository;
     private final PasswordStrengthService strengthService;
     private final EncryptionUtil encryptionUtil;
+
+    public void log(String action, String ip, String status) {
+        if (isBlank(action) || isBlank(ip) || isBlank(status)) {
+            throw new AuditException("Action, IP, and status are required");
+        }
+
+        try {
+            AuditLog auditLog = new AuditLog();
+            auditLog.setAction(action.trim());
+            auditLog.setIpAddress(ip.trim());
+            auditLog.setStatus(status.trim());
+            auditLog.setTimestamp(LocalDateTime.now());
+            auditLogRepository.save(auditLog);
+        } catch (Exception ex) {
+            throw new AuditException("Failed to save audit log");
+        }
+    }
+
+    public List<AuditLogResponse> getLogs() {
+        try {
+            return auditLogRepository.findAll()
+                    .stream()
+                    .sorted(Comparator.comparing(AuditLog::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder()))
+                            .reversed())
+                    .map(a -> new AuditLogResponse(a.getAction(), a.getIpAddress(), a.getStatus(), a.getTimestamp()))
+                    .collect(Collectors.toList());
+        } catch (Exception ex) {
+            throw new AuditException("Failed to fetch audit logs");
+        }
+    }
 
     public AuditResponse generateAudit() {
         List<PasswordEntry> list = repo.findAllByOrderByCreatedAtDesc();
@@ -238,7 +275,6 @@ public class AuditService {
 
     private boolean saveAlert(String msg, String type, String severity) {
         LocalDateTime now = LocalDateTime.now();
-        // Avoid flooding duplicate alerts when audit is run repeatedly in a short period.
         boolean duplicateRecent = alertRepo.existsByMessageAndTypeAndCreatedAtAfter(
                 msg,
                 type,
@@ -258,4 +294,9 @@ public class AuditService {
         );
         return true;
     }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
 }
+

@@ -14,7 +14,10 @@ export interface PasswordResponse {
 }
 
 export interface SavePasswordRequest {
+  title?: string;
   username: string;
+  website?: string;
+  category?: 'SOCIAL' | 'BANKING' | 'WORK' | 'SHOPPING' | 'OTHER';
   password: string;
 }
 

@@ -16,6 +16,7 @@ import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { MasterPasswordComponent } from './master-password/master-password.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ConsoleComponent } from './pages/console/console.component';
 
 import { AuthTokenInterceptor } from './core/interceptors/auth-token.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
@@ -31,7 +32,8 @@ import { ErrorInterceptor } from './core/interceptors/error.interceptor';
     RegisterComponent,
     LoginComponent,
     MasterPasswordComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    ConsoleComponent
   ],
   imports: [
     BrowserModule,

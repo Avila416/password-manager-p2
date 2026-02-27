@@ -2,9 +2,11 @@ package com.passwordmanager.controller;
 
 import java.util.Map;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.passwordmanager.dto.AuthResponseDTO;
 import com.passwordmanager.dto.ChangePasswordDTO;
+import com.passwordmanager.dto.EmailRequestDTO;
 import com.passwordmanager.dto.ForgotMasterPasswordRequestDTO;
 import com.passwordmanager.dto.ForgotPasswordRequestDTO;
 import com.passwordmanager.dto.LoginRequestDTO;
 import com.passwordmanager.dto.MasterPasswordSetupDTO;
+import com.passwordmanager.dto.OtpVerifyRequestDTO;
 import com.passwordmanager.dto.RegisterRequestDTO;
 import com.passwordmanager.dto.TwoFactorDTO;
 import com.passwordmanager.dto.TwoFactorStatusDTO;
@@ -34,6 +38,7 @@ import com.passwordmanager.service.TwoFactorService;
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/auth")
+@Validated
 public class AuthenticationController {
     private final AuthService authService;
     private final TwoFactorService twoFactorService;
@@ -52,41 +57,35 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/password/forgot/request")
-    public ResponseEntity<Map<String, String>> requestForgotPasswordCode(@RequestBody Map<String, String> request) {
-        if (request == null || request.get("email") == null || request.get("email").isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
-        authService.requestForgotPasswordCode(request.get("email"));
+    public ResponseEntity<Map<String, String>> requestForgotPasswordCode(@Valid @RequestBody EmailRequestDTO request) {
+        authService.requestForgotPasswordCode(request.getEmail());
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
 
     @PostMapping("/password/forgot/reset")
-    public ResponseEntity<Map<String, String>> resetForgotPassword(@RequestBody ForgotPasswordRequestDTO request) {
+    public ResponseEntity<Map<String, String>> resetForgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO request) {
         authService.resetForgotPassword(request);
         return ResponseEntity.ok(Map.of("message", "Password reset successful"));
     }
 
     @PostMapping("/master-password/forgot/request")
-    public ResponseEntity<Map<String, String>> requestForgotMasterPasswordCode(@RequestBody Map<String, String> request) {
-        if (request == null || request.get("email") == null || request.get("email").isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
-        authService.requestForgotMasterPasswordCode(request.get("email"));
+    public ResponseEntity<Map<String, String>> requestForgotMasterPasswordCode(@Valid @RequestBody EmailRequestDTO request) {
+        authService.requestForgotMasterPasswordCode(request.getEmail());
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
 
     @PostMapping("/master-password/forgot/reset")
-    public ResponseEntity<Map<String, String>> resetForgotMasterPassword(@RequestBody ForgotMasterPasswordRequestDTO request) {
+    public ResponseEntity<Map<String, String>> resetForgotMasterPassword(@Valid @RequestBody ForgotMasterPasswordRequestDTO request) {
         authService.resetForgotMasterPassword(request);
         return ResponseEntity.ok(Map.of("message", "Master password reset successful"));
     }
@@ -116,7 +115,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/master-password/setup")
-    public ResponseEntity<Map<String, String>> setupMasterPassword(@RequestBody MasterPasswordSetupDTO request) {
+    public ResponseEntity<Map<String, String>> setupMasterPassword(@Valid @RequestBody MasterPasswordSetupDTO request) {
         authService.setupMasterPassword(
                 getCurrentUserEmail(),
                 request.getMasterPassword(),
@@ -125,30 +124,24 @@ public class AuthenticationController {
     }
 
     @PutMapping("/master-password/change")
-    public ResponseEntity<Map<String, String>> changeMasterPassword(@RequestBody ChangePasswordDTO request) {
+    public ResponseEntity<Map<String, String>> changeMasterPassword(@Valid @RequestBody ChangePasswordDTO request) {
         authService.changeMasterPassword(getCurrentUserEmail(), request);
         return ResponseEntity.ok(Map.of("message", "Master password changed successfully"));
     }
 
     @PutMapping("/2fa/status")
-    public ResponseEntity<TwoFactorStatusDTO> updateTwoFactorStatus(@RequestBody TwoFactorStatusDTO request) {
+    public ResponseEntity<TwoFactorStatusDTO> updateTwoFactorStatus(@Valid @RequestBody TwoFactorStatusDTO request) {
         return ResponseEntity.ok(authService.updateTwoFactorStatus(getCurrentUserEmail(), request));
     }
 
     @PostMapping("/2fa/request")
-    public ResponseEntity<Map<String, String>> requestOtp(@RequestBody TwoFactorDTO request) {
-        if (request == null || request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
+    public ResponseEntity<Map<String, String>> requestOtp(@Valid @RequestBody TwoFactorDTO request) {
         twoFactorService.requestOtp(request.getEmail());
         return ResponseEntity.ok(Map.of("message", "OTP sent"));
     }
 
     @PostMapping("/2fa/verify")
-    public ResponseEntity<Map<String, Object>> verifyOtp(@RequestBody TwoFactorDTO request) {
-        if (request == null || request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
+    public ResponseEntity<Map<String, Object>> verifyOtp(@Valid @RequestBody OtpVerifyRequestDTO request) {
         boolean verified = twoFactorService.verifyOtp(request.getEmail(), request.getOtp());
         if (!verified) {
             throw new UnauthorizedAccessException("Invalid or expired OTP");

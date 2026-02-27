@@ -17,12 +17,16 @@ public class PasswordEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
     private String username;
 
     // for audit module we just store plain for now
     private String encryptedPassword;
 
     private String website;
+
+    private String category;
 
     private Boolean favorite;
 

@@ -17,6 +17,9 @@ export class MasterPasswordComponent implements OnInit {
   twoFaError = '';
   forgotMessage = '';
   forgotError = '';
+  showChangeConfirmModal = false;
+  isChangingMasterPassword = false;
+  pendingMasterPasswordChange: { oldMasterPassword: string; newMasterPassword: string } | null = null;
 
   setupForm = {
     masterPassword: '',
@@ -57,9 +60,28 @@ export class MasterPasswordComponent implements OnInit {
   setupMasterPassword() {
     this.setupError = '';
     this.setupMessage = '';
+
+    const masterPassword = this.setupForm.masterPassword.trim();
+    const confirmMasterPassword = this.setupForm.confirmMasterPassword.trim();
+
+    if (!masterPassword || !confirmMasterPassword) {
+      this.setupError = 'Master password and confirm password are required';
+      return;
+    }
+
+    if (masterPassword.length < 6) {
+      this.setupError = 'Master password must be at least 6 characters';
+      return;
+    }
+
+    if (masterPassword !== confirmMasterPassword) {
+      this.setupError = 'Master password and confirm password must match';
+      return;
+    }
+
     this.authService.setupMasterPassword(
-      this.setupForm.masterPassword,
-      this.setupForm.confirmMasterPassword
+      masterPassword,
+      confirmMasterPassword
     ).subscribe({
       next: (resp) => {
         this.setupMessage = resp.message;
@@ -73,20 +95,43 @@ export class MasterPasswordComponent implements OnInit {
   changeMasterPassword() {
     this.changeError = '';
     this.changeMessage = '';
+    const oldMasterPassword = this.changeForm.oldMasterPassword.trim();
+    const newMasterPassword = this.changeForm.newMasterPassword.trim();
+    const confirmNewMasterPassword = this.changeForm.confirmNewMasterPassword.trim();
 
-    if (this.changeForm.newMasterPassword !== this.changeForm.confirmNewMasterPassword) {
+    if (!oldMasterPassword || !newMasterPassword || !confirmNewMasterPassword) {
+      this.changeError = 'All fields are required';
+      return;
+    }
+
+    if (newMasterPassword.length < 6) {
+      this.changeError = 'New master password must be at least 6 characters';
+      return;
+    }
+
+    if (newMasterPassword !== confirmNewMasterPassword) {
       this.changeError = 'New master password and confirm password must match';
       return;
     }
 
-    const confirmed = window.confirm('Are you sure you want to change your master password?');
-    if (!confirmed) {
+    this.pendingMasterPasswordChange = { oldMasterPassword, newMasterPassword };
+    this.showChangeConfirmModal = true;
+  }
+
+  cancelChangeMasterPassword(): void {
+    this.showChangeConfirmModal = false;
+    this.pendingMasterPasswordChange = null;
+  }
+
+  confirmChangeMasterPassword(): void {
+    if (!this.pendingMasterPasswordChange || this.isChangingMasterPassword) {
       return;
     }
 
+    this.isChangingMasterPassword = true;
     this.authService.changeMasterPassword(
-      this.changeForm.oldMasterPassword,
-      this.changeForm.newMasterPassword
+      this.pendingMasterPasswordChange.oldMasterPassword,
+      this.pendingMasterPasswordChange.newMasterPassword
     ).subscribe({
       next: (resp) => {
         this.changeMessage = resp.message;
@@ -95,9 +140,13 @@ export class MasterPasswordComponent implements OnInit {
           newMasterPassword: '',
           confirmNewMasterPassword: ''
         };
+        this.cancelChangeMasterPassword();
+        this.isChangingMasterPassword = false;
       },
       error: (err) => {
         this.changeError = this.extractError(err, 'Failed to change master password');
+        this.cancelChangeMasterPassword();
+        this.isChangingMasterPassword = false;
       }
     });
   }
@@ -119,13 +168,19 @@ export class MasterPasswordComponent implements OnInit {
   requestForgotMasterPasswordCode() {
     this.forgotError = '';
     this.forgotMessage = '';
+    const email = this.forgotForm.email.trim();
 
-    if (!this.forgotForm.email) {
+    if (!email) {
       this.forgotError = 'Email is required';
       return;
     }
 
-    this.authService.requestForgotMasterPasswordCode(this.forgotForm.email).subscribe({
+    if (!this.isValidEmail(email)) {
+      this.forgotError = 'Enter a valid email address';
+      return;
+    }
+
+    this.authService.requestForgotMasterPasswordCode(email).subscribe({
       next: (resp) => {
         this.forgotMessage = resp.message;
       },
@@ -138,17 +193,36 @@ export class MasterPasswordComponent implements OnInit {
   resetForgotMasterPassword() {
     this.forgotError = '';
     this.forgotMessage = '';
+    const email = this.forgotForm.email.trim();
+    const verificationCode = this.forgotForm.verificationCode.trim();
+    const newMasterPassword = this.forgotForm.newMasterPassword.trim();
+    const confirmMasterPassword = this.forgotForm.confirmMasterPassword.trim();
 
-    if (this.forgotForm.newMasterPassword !== this.forgotForm.confirmMasterPassword) {
+    if (!email || !verificationCode || !newMasterPassword || !confirmMasterPassword) {
+      this.forgotError = 'All fields are required';
+      return;
+    }
+
+    if (!this.isValidEmail(email)) {
+      this.forgotError = 'Enter a valid email address';
+      return;
+    }
+
+    if (newMasterPassword.length < 6) {
+      this.forgotError = 'New master password must be at least 6 characters';
+      return;
+    }
+
+    if (newMasterPassword !== confirmMasterPassword) {
       this.forgotError = 'New master password and confirm master password must match';
       return;
     }
 
     this.authService.resetForgotMasterPassword({
-      email: this.forgotForm.email,
-      verificationCode: this.forgotForm.verificationCode,
-      newMasterPassword: this.forgotForm.newMasterPassword,
-      confirmMasterPassword: this.forgotForm.confirmMasterPassword
+      email,
+      verificationCode,
+      newMasterPassword,
+      confirmMasterPassword
     }).subscribe({
       next: (resp) => {
         this.forgotMessage = resp.message;
@@ -171,5 +245,9 @@ export class MasterPasswordComponent implements OnInit {
       return 'Session expired. Please login again.';
     }
     return backendMessage ?? fallback;
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 }

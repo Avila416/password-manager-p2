@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/vault")
-@CrossOrigin(originPatterns = {"http://localhost:*", "chrome-extension://*"})
+@CrossOrigin(originPatterns = {"http://localhost:4200", "chrome-extension://*"})
 @Validated
 @RequiredArgsConstructor
 public class VaultController {

@@ -1,8 +1,11 @@
-﻿import { inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
-export const vaultGuard: CanActivateFn = () => {
+export const vaultGuard: CanActivateFn = (_route, state) => {
   const router = inject(Router);
-  const token = localStorage.getItem('pm_token');
-  return token ? true : router.createUrlTree(['/auth-required']);
+  const authService = inject(AuthService);
+  return authService.isAuthenticated()
+    ? true
+    : router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
 };

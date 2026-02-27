@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/security")
-@CrossOrigin(originPatterns = {"http://localhost:*", "chrome-extension://*"})
+@CrossOrigin(originPatterns = {"http://localhost:4200", "chrome-extension://*"})
 public class SecurityController {
 
     private final EncryptionUtil encryptionUtil;

@@ -14,6 +14,13 @@ type GeneratorForm = FormGroup<{
   excludeSimilar: FormControl<boolean | null>;
 }>;
 
+type SaveToVaultForm = FormGroup<{
+  title: FormControl<string | null>;
+  username: FormControl<string | null>;
+  website: FormControl<string | null>;
+  category: FormControl<'SOCIAL' | 'BANKING' | 'WORK' | 'SHOPPING' | 'OTHER' | null>;
+}>;
+
 @Component({
   selector: 'app-generator',
   templateUrl: './generator.component.html',
@@ -23,8 +30,18 @@ export class GeneratorComponent {
   generatedPasswords: PasswordResponse[] = [];
   isGenerating = false;
   isSaving = false;
+  showSaveDialog = false;
+  passwordToSave = '';
+  readonly categories: Array<'SOCIAL' | 'BANKING' | 'WORK' | 'SHOPPING' | 'OTHER'> = [
+    'SOCIAL',
+    'BANKING',
+    'WORK',
+    'SHOPPING',
+    'OTHER'
+  ];
 
   readonly form: GeneratorForm;
+  readonly saveForm: SaveToVaultForm;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -40,6 +57,13 @@ export class GeneratorComponent {
       specialChars: [false],
       excludeSimilar: [false]
     }) as GeneratorForm;
+
+    this.saveForm = this.fb.group({
+      title: [''],
+      username: ['generated-user', [Validators.required, Validators.maxLength(120)]],
+      website: ['', [Validators.required, Validators.maxLength(200)]],
+      category: [null, Validators.required]
+    }) as SaveToVaultForm;
   }
 
   generate(): void {
@@ -90,15 +114,51 @@ export class GeneratorComponent {
   }
 
   save(password: string): void {
+    this.passwordToSave = password;
+    this.showSaveDialog = true;
+    this.saveForm.controls.website.markAsPristine();
+    this.saveForm.controls.category.markAsPristine();
+  }
+
+  closeSaveDialog(): void {
+    this.showSaveDialog = false;
+    this.passwordToSave = '';
+    this.saveForm.patchValue({
+      title: '',
+      username: this.saveForm.controls.username.value || 'generated-user',
+      website: '',
+      category: null
+    });
+    this.saveForm.markAsPristine();
+    this.saveForm.markAsUntouched();
+  }
+
+  confirmSave(): void {
+    if (!this.passwordToSave) {
+      this.notifications.show({ type: 'warning', text: 'Select a generated password first.' });
+      return;
+    }
+
+    this.saveForm.markAllAsTouched();
+    if (this.saveForm.invalid) {
+      this.notifications.show({ type: 'warning', text: 'Website and category are required.' });
+      return;
+    }
+
+    const values = this.saveForm.getRawValue();
     this.isSaving = true;
     const savePayload: SavePasswordRequest = {
-      username: 'generated-user',
-      password
+      title: values.title?.trim() || '',
+      username: values.username?.trim() || 'generated-user',
+      website: values.website?.trim() || '',
+      category: values.category || undefined,
+      password: this.passwordToSave
     };
 
     this.api.savePassword(savePayload).subscribe({
       next: () => {
         this.notifications.show({ type: 'success', text: 'Password saved to vault.' });
+        this.closeSaveDialog();
       },
       error: () => {
         this.notifications.show({ type: 'error', text: 'Saving to vault failed.' });
@@ -109,20 +169,17 @@ export class GeneratorComponent {
     });
   }
 
-  strengthWidth(password: string, strength: string): number {
-    if (this.matchesSelectedConditions(password)) {
-      return 100;
-    }
-
+  strengthWidth(strength: string): number {
     switch (strength) {
       case 'WEAK':
-        return 25;
+        return 30;
       case 'MEDIUM':
         return 50;
       case 'STRONG':
-        return 75;
-      default:
+      case 'VERY_STRONG':
         return 100;
+      default:
+        return 0;
     }
   }
 
@@ -163,27 +220,29 @@ export class GeneratorComponent {
     return valid ? '' : 'Select at least one character set.';
   }
 
-  private matchesSelectedConditions(password: string): boolean {
-    const values = this.form.getRawValue();
-    const targetLength = values.length ?? 0;
+  get saveWebsiteError(): string {
+    const control = this.saveForm.controls.website;
+    if (!control.touched && !control.dirty) {
+      return '';
+    }
+    if (control.hasError('required')) {
+      return 'Website is required.';
+    }
+    if (control.hasError('maxlength')) {
+      return 'Website must be at most 200 characters.';
+    }
+    return '';
+  }
 
-    if (targetLength > 0 && password.length < targetLength) {
-      return false;
+  get saveCategoryError(): string {
+    const control = this.saveForm.controls.category;
+    if (!control.touched && !control.dirty) {
+      return '';
     }
-    if (values.uppercase && !/[A-Z]/.test(password)) {
-      return false;
+    if (control.hasError('required')) {
+      return 'Select a category.';
     }
-    if (values.lowercase && !/[a-z]/.test(password)) {
-      return false;
-    }
-    if (values.numbers && !/[0-9]/.test(password)) {
-      return false;
-    }
-    if (values.specialChars && !/[^A-Za-z0-9]/.test(password)) {
-      return false;
-    }
-
-    return true;
+    return '';
   }
 
   private fallbackCopy(text: string): void {

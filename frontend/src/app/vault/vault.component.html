@@ -60,16 +60,18 @@
   <section class="vault" *ngIf="!loading">
     <div [class.grid]="viewMode==='grid'" [class.list]="viewMode==='list'">
       <article class="card" *ngFor="let entry of (activeTab==='all' ? entries : favorites)">
-        <h3>{{ entry.title || '(No title)' }}</h3>
+        <h3>{{ entry.title || entry.username || '(No title)' }}</h3>
         <p><strong>User:</strong> {{ entry.username }}</p>
         <p><strong>Website:</strong> {{ entry.website }}</p>
         <p><strong>Category:</strong> {{ entry.category }}</p>
-        <p><strong>Stored:</strong> {{ maskPassword(entry.password) }}</p>
+        <p><strong>Stored:</strong> {{ entry.password }}</p>
         <p><strong>Created:</strong> {{ entry.createdAt | date:'medium' }}</p>
         <div class="card-actions">
           <button type="button" (click)="editEntry(entry)">Edit</button>
           <button type="button" (click)="openVerify(entry)">Verify & Reveal</button>
-          <button type="button" (click)="markFavorite(entry)">Favorite</button>
+          <button type="button" (click)="markFavorite(entry)" [disabled]="entry.favorite">
+            {{ entry.favorite ? 'Favorited' : 'Favorite' }}
+          </button>
           <button type="button" class="danger" (click)="openDeleteModal(entry)">Delete</button>
         </div>
       </article>

@@ -11,9 +11,10 @@ import { LoginComponent } from './login/login.component';
 import { MasterPasswordComponent } from './master-password/master-password.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { authGuard } from './guards/auth.guard';
+import { ConsoleComponent } from './pages/console/console.component';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'generator' },
+  { path: '', pathMatch: 'full', redirectTo: 'register' },
   { path: 'generator', component: GeneratorComponent, canActivate: [moduleAuthGuard] },
   { path: 'audit', component: AuditComponent, canActivate: [moduleAuthGuard] },
   { path: 'vault', component: VaultComponent, canActivate: [vaultGuard] },
@@ -22,9 +23,11 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'master-password', component: MasterPasswordComponent, canActivate: [authGuard] },
+  { path: 'backup-operations', component: ConsoleComponent, canActivate: [authGuard] },
+  { path: 'console', redirectTo: 'backup-operations', pathMatch: 'full' },
 
   { path: 'auth-required', component: AuthRequiredComponent },
-  { path: '**', redirectTo: 'generator' }
+  { path: '**', redirectTo: 'register' }
 ];
 
 @NgModule({

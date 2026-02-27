@@ -1,4 +1,4 @@
-﻿.card {
+.card {
   background: #ffffff;
   border: 1px solid #c4d5ff;
   border-top: 6px solid #2a4aa2;
@@ -23,6 +23,7 @@ label {
 }
 
 input {
+  width: 100%;
   border: 1px solid #b7caf9;
   border-radius: 8px;
   padding: 10px;
@@ -36,7 +37,7 @@ input:focus {
 }
 
 button {
-  width: 140px;
+  width: 100%;
   border: 1px solid #2a4aa2;
   background: #2a4aa2;
   color: #fff;
@@ -47,6 +48,26 @@ button {
 
 button:hover {
   background: #223f8a;
+}
+
+.actions {
+  margin-top: 4px;
+  display: grid;
+}
+
+.links {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+a {
+  color: #214ea8;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 .ok { color: #186a30; }

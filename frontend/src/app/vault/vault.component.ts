@@ -1,8 +1,9 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Category, SearchPayload, VaultEntry, VaultEntryPayload } from '../models/vault.models';
 import { VaultApiService } from '../services/vault-api.service';
+import { NotificationService } from '../core/services/notification.service';
 
 @Component({
   selector: 'app-vault',
@@ -42,7 +43,11 @@ export class VaultComponent implements OnInit {
     direction: ['asc']
   });
 
-  constructor(private fb: FormBuilder, private api: VaultApiService) {}
+  constructor(
+    private fb: FormBuilder,
+    private api: VaultApiService,
+    private notifications: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadAllEntries();
@@ -57,7 +62,7 @@ export class VaultComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = this.extractErrorMessage(err, 'Failed to load entries');
+        this.showError(this.extractErrorMessage(err, 'Failed to load entries'));
         this.loading = false;
       }
     });
@@ -66,7 +71,7 @@ export class VaultComponent implements OnInit {
   loadFavorites(): void {
     this.api.getFavorites().subscribe({
       next: (data) => (this.favorites = data),
-      error: (err) => (this.error = this.extractErrorMessage(err, 'Failed to load favorites'))
+      error: (err) => this.showError(this.extractErrorMessage(err, 'Failed to load favorites'))
     });
   }
 
@@ -76,6 +81,7 @@ export class VaultComponent implements OnInit {
 
     if (this.entryForm.invalid) {
       this.entryForm.markAllAsTouched();
+      this.showWarning('Fill required fields before saving');
       return;
     }
 
@@ -92,7 +98,7 @@ export class VaultComponent implements OnInit {
     }
 
     if (!this.editingId && !rawPassword) {
-      this.error = 'Password is required for new entry';
+      this.showWarning('Password is required for new entry');
       return;
     }
 
@@ -102,13 +108,13 @@ export class VaultComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.success = this.editingId ? 'Entry updated' : 'Entry added';
+        this.showSuccess(this.editingId ? 'Entry updated' : 'Entry added');
         this.resetForm();
         this.loadAllEntries();
         this.loadFavorites();
       },
       error: (err) => {
-        this.error = this.extractErrorMessage(err, 'Failed to save entry');
+        this.showError(this.extractErrorMessage(err, 'Failed to save entry'));
       }
     });
   }
@@ -132,12 +138,18 @@ export class VaultComponent implements OnInit {
   }
 
   markFavorite(entry: VaultEntry): void {
+    if (entry.favorite) {
+      this.showWarning('Entry is already in favorites');
+      return;
+    }
+
     this.api.markFavorite(entry.id).subscribe({
       next: () => {
+        this.showSuccess('Entry added to favorites');
         this.loadAllEntries();
         this.loadFavorites();
       },
-      error: (err) => (this.error = this.extractErrorMessage(err, 'Failed to mark favorite'))
+      error: (err) => this.showError(this.extractErrorMessage(err, 'Failed to mark favorite'))
     });
   }
 
@@ -158,19 +170,19 @@ export class VaultComponent implements OnInit {
 
     const masterPassword = this.deleteMasterPassword.trim();
     if (!masterPassword) {
-      this.error = 'Enter master password';
+      this.showWarning('Enter master password');
       return;
     }
 
     this.api.deleteEntry(this.deleteEntryTarget.id, masterPassword).subscribe({
       next: () => {
-        this.success = 'Entry deleted';
+        this.showSuccess('Entry deleted');
         this.closeDeleteModal();
         this.loadAllEntries();
         this.loadFavorites();
       },
       error: (err) => {
-        this.error = this.extractErrorMessage(err, 'Failed to delete entry');
+        this.showError(this.extractErrorMessage(err, 'Failed to delete entry'));
       }
     });
   }
@@ -188,14 +200,16 @@ export class VaultComponent implements OnInit {
       next: (data) => {
         this.entries = data;
         this.activeTab = 'all';
+        this.showSuccess('Search applied');
       },
-      error: (err) => (this.error = this.extractErrorMessage(err, 'Search failed'))
+      error: (err) => this.showError(this.extractErrorMessage(err, 'Search failed'))
     });
   }
 
   clearSearch(): void {
     this.searchForm.reset({ sortBy: 'title', direction: 'asc' });
     this.loadAllEntries();
+    this.showSuccess('Search reset');
   }
 
   openVerify(entry: VaultEntry): void {
@@ -211,16 +225,20 @@ export class VaultComponent implements OnInit {
   }
 
   verifyAndReveal(): void {
-    if (!this.selectedEntry || !this.verifyMasterPassword) {
+    const masterPassword = this.verifyMasterPassword.trim();
+    if (!this.selectedEntry || !masterPassword) {
+      this.showWarning('Enter master password');
       return;
     }
 
-    this.api.verifyAndGet(this.selectedEntry.id, this.verifyMasterPassword).subscribe({
+    this.error = '';
+    this.api.verifyAndGet(this.selectedEntry.id, masterPassword).subscribe({
       next: (entry) => {
         this.revealedPassword = entry.password;
+        this.showSuccess('Password verified and revealed');
       },
       error: (err) => {
-        this.error = this.extractErrorMessage(err, 'Verification failed');
+        this.showError(this.extractErrorMessage(err, 'Verification failed'));
       }
     });
   }
@@ -242,10 +260,6 @@ export class VaultComponent implements OnInit {
       return 'Cannot connect to backend. Start Spring Boot on localhost:8084.';
     }
 
-    if (err.status === 401 || err.status === 403) {
-      return 'Unauthorized request. Please login again.';
-    }
-
     if (typeof err.error === 'string' && err.error.trim()) {
       return err.error;
     }
@@ -257,13 +271,32 @@ export class VaultComponent implements OnInit {
       }
     }
 
+    if (err.status === 401 || err.status === 403) {
+      return 'Unauthorized request. Please login again.';
+    }
+
     if (typeof err.message === 'string' && err.message.trim()) {
       return err.message;
     }
 
     return fallback;
   }
+
+  private showSuccess(message: string): void {
+    this.success = message;
+    this.error = '';
+    this.notifications.show({ type: 'success', text: message });
+  }
+
+  private showError(message: string): void {
+    this.error = message;
+    this.success = '';
+    this.notifications.show({ type: 'error', text: message });
+  }
+
+  private showWarning(message: string): void {
+    this.error = message;
+    this.success = '';
+    this.notifications.show({ type: 'warning', text: message });
+  }
 }
-
-
-
