@@ -1,135 +1,91 @@
 package com.passwordmanager.controller;
 
-import com.passwordmanager.dto.VaultEntryRequest;
-import com.passwordmanager.entity.VaultEntry;
-import com.passwordmanager.exception.ResourceNotFoundException;
-import com.passwordmanager.repository.VaultEntryRepository;
-import com.passwordmanager.service.AuditService;
-import com.passwordmanager.util.AuditActions;
+import com.passwordmanager.dto.MasterPasswordVerifyDTO;
+import com.passwordmanager.dto.PasswordEntryRequestDTO;
+import com.passwordmanager.dto.PasswordEntryResponseDTO;
+import com.passwordmanager.dto.SearchFilterDTO;
+import com.passwordmanager.dto.UpdatePasswordEntryDTO;
+import com.passwordmanager.service.VaultService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.net.URI;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/vault")
-@CrossOrigin(originPatterns = {"http://localhost:*"})
+@CrossOrigin(originPatterns = {"http://localhost:4200", "chrome-extension://*"})
 @Validated
+@RequiredArgsConstructor
 public class VaultController {
 
-    private final VaultEntryRepository vaultEntryRepository;
-    private final AuditService auditService;
+    private final VaultService service;
 
-    public VaultController(VaultEntryRepository vaultEntryRepository, AuditService auditService) {
-        this.vaultEntryRepository = vaultEntryRepository;
-        this.auditService = auditService;
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public PasswordEntryResponseDTO add(@Valid @RequestBody PasswordEntryRequestDTO dto) {
+        return service.addEntry(dto);
     }
 
-    @GetMapping("/entries")
-    public List<VaultEntry> allEntries() {
-        return vaultEntryRepository.findAll();
+    @PutMapping("/{id}")
+    public PasswordEntryResponseDTO update(@PathVariable @Positive Long id,
+                                           @Valid @RequestBody UpdatePasswordEntryDTO dto) {
+        return service.updateEntry(id, dto);
     }
 
-    @PostMapping("/entries")
-    public VaultEntry addEntry(@Valid @RequestBody VaultEntryRequest request) {
-        VaultEntry entry = new VaultEntry();
-        entry.setTitle(request.getTitle());
-        entry.setUsername(request.getUsername());
-        entry.setPassword(request.getPassword());
-        entry.setWebsite(request.getWebsite() == null || request.getWebsite().isBlank() ? request.getTitle() : request.getWebsite());
-        entry.setCreatedAt(LocalDateTime.now());
-        return vaultEntryRepository.save(entry);
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable @Positive Long id,
+                       @RequestParam @NotBlank(message = "Master password is required") String masterPassword) {
+        service.deleteEntry(id, masterPassword.trim());
+    }
+
+    @GetMapping
+    public List<PasswordEntryResponseDTO> getAll() {
+        return service.getAllEntries();
+    }
+
+    @GetMapping("/{id}")
+    public PasswordEntryResponseDTO getById(@PathVariable @Positive Long id,
+                                            @RequestParam @NotBlank(message = "Master password is required") String masterPassword) {
+        return service.getEntryById(id, masterPassword.trim());
+    }
+
+    @PostMapping("/{id}/verify")
+    public PasswordEntryResponseDTO verifyAndGet(@PathVariable @Positive Long id,
+                                                 @Valid @RequestBody MasterPasswordVerifyDTO dto) {
+        return service.getEntryById(id, dto.getMasterPassword().trim());
+    }
+
+    @PutMapping("/{id}/favorite")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void markFavorite(@PathVariable @Positive Long id) {
+        service.markFavorite(id);
+    }
+
+    @GetMapping("/favorites")
+    public List<PasswordEntryResponseDTO> getFavorites() {
+        return service.getFavoritesEntries();
     }
 
     @GetMapping("/by-domain")
-    public List<VaultEntry> byDomain(@RequestParam @NotBlank(message = "Domain is required") String domain) {
-        String normalizedDomain = normalizeDomain(domain);
-        return vaultEntryRepository.findAll()
-                .stream()
-                .filter(entry -> {
-                    String source = entry.getWebsite() == null || entry.getWebsite().isBlank() ? entry.getTitle() : entry.getWebsite();
-                    return matchesDomain(source, normalizedDomain);
-                })
-                .collect(Collectors.toList());
+    public List<PasswordEntryResponseDTO> getByDomain(
+            @RequestParam @NotBlank(message = "Domain is required") String domain) {
+        return service.getEntriesByDomain(domain.trim());
     }
 
-    @GetMapping("/entries/{id}")
-    public VaultEntry viewEntry(@PathVariable @Positive(message = "ID must be positive") Long id,
-                                @RequestParam(defaultValue = "127.0.0.1") @NotBlank(message = "IP must not be blank") String ip) {
-        VaultEntry entry = vaultEntryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vault entry not found: " + id));
-        auditService.log(AuditActions.PASSWORD_VIEW, ip, "SUCCESS");
-        return entry;
-    }
+    @PostMapping("/search")
+    public List<PasswordEntryResponseDTO> search(
+            @Valid @RequestBody SearchFilterDTO dto,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false)
+            @Pattern(regexp = "^(asc|desc)?$", message = "direction must be asc or desc") String direction) {
 
-    @DeleteMapping("/entries/{id}")
-    public String deleteEntry(@PathVariable @Positive(message = "ID must be positive") Long id,
-                              @RequestParam(defaultValue = "127.0.0.1") @NotBlank(message = "IP must not be blank") String ip) {
-        if (!vaultEntryRepository.existsById(id)) {
-            auditService.log(AuditActions.DELETE_ENTRY, ip, "FAILED");
-            throw new ResourceNotFoundException("Vault entry not found: " + id);
-        }
-        vaultEntryRepository.deleteById(id);
-        auditService.log(AuditActions.DELETE_ENTRY, ip, "SUCCESS");
-        return "Vault entry deleted";
-    }
-
-    @PostMapping("/monitor/login")
-    public String logLoginAttempt(@RequestParam boolean success,
-                                  @RequestParam(defaultValue = "127.0.0.1") @NotBlank(message = "IP must not be blank") String ip) {
-        if (success) {
-            auditService.log(AuditActions.LOGIN_ATTEMPT, ip, "SUCCESS");
-            return "Login attempt logged";
-        }
-        auditService.log(AuditActions.FAILED_LOGIN_ATTEMPT, ip, "FAILED");
-        return "Failed login attempt logged";
-    }
-
-    @PostMapping("/monitor/master-password-change")
-    public String logMasterPasswordChange(@RequestParam(defaultValue = "127.0.0.1") @NotBlank(message = "IP must not be blank") String ip) {
-        auditService.log(AuditActions.MASTER_PASSWORD_CHANGE, ip, "SUCCESS");
-        return "Master password change logged";
-    }
-
-    private boolean matchesDomain(String website, String normalizedDomain) {
-        if (website == null || website.isBlank()) {
-            return false;
-        }
-        String siteDomain = extractDomain(website);
-        return siteDomain.equals(normalizedDomain)
-                || siteDomain.endsWith("." + normalizedDomain)
-                || normalizedDomain.endsWith("." + siteDomain);
-    }
-
-    private String normalizeDomain(String rawDomain) {
-        String trimmed = rawDomain.trim().toLowerCase(Locale.ROOT);
-        if (trimmed.startsWith("www.")) {
-            return trimmed.substring(4);
-        }
-        return trimmed;
-    }
-
-    private String extractDomain(String website) {
-        String candidate = website.trim();
-        if (!candidate.startsWith("http://") && !candidate.startsWith("https://")) {
-            candidate = "https://" + candidate;
-        }
-        try {
-            String host = Optional.ofNullable(URI.create(candidate).getHost()).orElse("");
-            if (host.startsWith("www.")) {
-                return host.substring(4).toLowerCase(Locale.ROOT);
-            }
-            return host.toLowerCase(Locale.ROOT);
-        } catch (Exception ex) {
-            return website.trim().toLowerCase(Locale.ROOT).replaceFirst("^www\\.", "");
-        }
+        return service.searchAndFilter(dto, sortBy, direction);
     }
 }

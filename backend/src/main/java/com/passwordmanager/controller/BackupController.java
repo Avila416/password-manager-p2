@@ -25,7 +25,7 @@ public class BackupController {
     }
 
     @PostMapping("/restore")
-    public String restore(@RequestBody JsonNode req) {
+    public Map<String, Object> restore(@RequestBody JsonNode req) {
         return service.restoreBackup(extractFileContent(req));
     }
 

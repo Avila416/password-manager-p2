@@ -1,10 +1,10 @@
 package com.passwordmanager.service.impl;
 
 import com.passwordmanager.dto.DashboardResponse;
-import com.passwordmanager.entity.VaultEntry;
 import com.passwordmanager.exception.DashboardException;
 import com.passwordmanager.repository.AuditLogRepository;
-import com.passwordmanager.repository.VaultEntryRepository;
+import com.passwordmanager.repository.PasswordEntryRepository;
+import com.passwordmanager.security.EncryptionUtil;
 import com.passwordmanager.service.DashboardService;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +15,24 @@ import java.util.stream.Collectors;
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
-    private final VaultEntryRepository vaultEntryRepository;
+    private final PasswordEntryRepository passwordEntryRepository;
     private final AuditLogRepository auditLogRepository;
+    private final EncryptionUtil encryptionUtil;
 
-    public DashboardServiceImpl(VaultEntryRepository vaultEntryRepository, AuditLogRepository auditLogRepository) {
-        this.vaultEntryRepository = vaultEntryRepository;
+    public DashboardServiceImpl(PasswordEntryRepository passwordEntryRepository, AuditLogRepository auditLogRepository,
+                                EncryptionUtil encryptionUtil) {
+        this.passwordEntryRepository = passwordEntryRepository;
         this.auditLogRepository = auditLogRepository;
+        this.encryptionUtil = encryptionUtil;
     }
 
     @Override
     public DashboardResponse getDashboard() {
         try {
-            long totalPasswords = vaultEntryRepository.count();
-            long recentlyAdded = vaultEntryRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(7));
-            long weakPasswords = vaultEntryRepository.findAll().stream()
-                    .filter(entry -> isWeak(entry.getPassword()))
+            long totalPasswords = passwordEntryRepository.count();
+            long recentlyAdded = passwordEntryRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(7));
+            long weakPasswords = passwordEntryRepository.findAll().stream()
+                    .filter(entry -> isWeak(encryptionUtil.decrypt(entry.getEncryptedPassword())))
                     .count();
             Map<String, Long> actionStats = auditLogRepository.findAll().stream()
                     .collect(Collectors.groupingBy(a -> a.getAction(), Collectors.counting()));

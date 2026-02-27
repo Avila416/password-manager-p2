@@ -1,19 +1,14 @@
-﻿import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { VaultEntry } from '../../models/vault.models';
+import { VaultApiService } from '../../services/vault-api.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 interface DashboardResponse {
   totalPasswords: number;
   weakPasswords: number;
   recentPasswords: number;
   actionStats?: Record<string, number>;
-}
-
-interface VaultEntry {
-  id: number;
-  title: string;
-  username: string;
-  password: string;
-  createdAt: string;
 }
 
 interface AuditLog {
@@ -47,22 +42,28 @@ interface BackupUpdateResponse {
   updatedAt: string;
 }
 
+interface BackupRestoreResponse {
+  message: string;
+  restoredEntries: number;
+  restoredAt: string;
+}
+
 @Component({
   selector: 'app-console',
   templateUrl: './console.component.html',
   styleUrls: ['./console.component.css']
 })
 export class ConsoleComponent implements OnInit {
+  private readonly apiBaseUrl = 'http://localhost:8084/api';
+
   dashboard: DashboardResponse | null = null;
   entries: VaultEntry[] = [];
   auditLogs: AuditLog[] = [];
   revealedPasswords: Record<number, string> = {};
-
-  newEntry = {
-    title: '',
-    username: '',
-    password: ''
-  };
+  selectedEntry: VaultEntry | null = null;
+  masterPasswordInput = '';
+  masterAction: 'view' | 'delete' | null = null;
+  processingMasterAction = false;
 
   auditFilter = {
     action: '',
@@ -70,13 +71,10 @@ export class ConsoleComponent implements OnInit {
     ip: ''
   };
 
-  loginMonitor = {
-    success: true,
-    ip: '127.0.0.1'
-  };
-
   backupContent = '';
   backupExport = '';
+  showBackupContent = false;
+  showTechnicalDetails = false;
   backupValidationResult: BackupValidateResponse | null = null;
   backupUpdateResult: BackupUpdateResponse | null = null;
   latestBackupInfo: LatestBackupInfo | null = null;
@@ -86,7 +84,11 @@ export class ConsoleComponent implements OnInit {
   error = '';
   lastRefreshedAt = '';
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly vaultApi: VaultApiService,
+    private readonly notifications: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.refreshAll();
@@ -101,22 +103,23 @@ export class ConsoleComponent implements OnInit {
     this.fetchEntries();
     this.fetchAuditLogs();
     this.fetchLatestBackupInfo();
+    this.showSuccess(`Data refreshed at ${this.lastRefreshedAt}`);
   }
 
   fetchDashboard(): void {
-    this.http.get<DashboardResponse>('/api/dashboard').subscribe({
+    this.http.get<DashboardResponse>(`${this.apiBaseUrl}/dashboard`).subscribe({
       next: (data) => {
         this.dashboard = data;
         this.error = '';
       },
       error: () => {
-        this.error = 'Failed to load dashboard.';
+        this.showError('Failed to load dashboard.');
       }
     });
   }
 
   fetchEntries(): void {
-    this.http.get<VaultEntry[]>('/api/vault/entries').subscribe({
+    this.vaultApi.getAllEntries().subscribe({
       next: (data) => {
         this.entries = data;
         this.error = '';
@@ -128,27 +131,7 @@ export class ConsoleComponent implements OnInit {
         });
       },
       error: () => {
-        this.error = 'Failed to load vault entries.';
-      }
-    });
-  }
-
-  addEntry(): void {
-    if (!this.newEntry.title || !this.newEntry.username || !this.newEntry.password) {
-      this.error = 'All entry fields are required.';
-      return;
-    }
-
-    this.http.post<VaultEntry>('/api/vault/entries', this.newEntry).subscribe({
-      next: () => {
-        this.newEntry = { title: '', username: '', password: '' };
-        this.message = 'Vault entry created.';
-        this.error = '';
-        this.fetchEntries();
-        this.fetchDashboard();
-      },
-      error: () => {
-        this.error = 'Failed to create vault entry.';
+        this.showError('Failed to load vault entries.');
       }
     });
   }
@@ -158,36 +141,16 @@ export class ConsoleComponent implements OnInit {
       delete this.revealedPasswords[entry.id];
       return;
     }
-
-    const params = new HttpParams().set('ip', this.loginMonitor.ip || '127.0.0.1');
-    this.http.get<VaultEntry>(`/api/vault/entries/${entry.id}`, { params }).subscribe({
-      next: (viewedEntry) => {
-        this.revealedPasswords[viewedEntry.id] = viewedEntry.password;
-        this.error = '';
-        this.fetchAuditLogs();
-        this.fetchDashboard();
-      },
-      error: () => {
-        this.error = 'Failed to view vault entry.';
-      }
-    });
+    this.openMasterPasswordModal(entry, 'view');
   }
 
   deleteEntry(entryId: number): void {
-    const params = new HttpParams().set('ip', this.loginMonitor.ip || '127.0.0.1');
-    this.http.delete(`/api/vault/entries/${entryId}`, { params, responseType: 'text' }).subscribe({
-      next: (res) => {
-        delete this.revealedPasswords[entryId];
-        this.message = res;
-        this.error = '';
-        this.fetchEntries();
-        this.fetchAuditLogs();
-        this.fetchDashboard();
-      },
-      error: () => {
-        this.error = 'Failed to delete vault entry.';
-      }
-    });
+    const target = this.entries.find((entry) => entry.id === entryId);
+    if (!target) {
+      this.showWarning('Vault entry not found.');
+      return;
+    }
+    this.openMasterPasswordModal(target, 'delete');
   }
 
   fetchAuditLogs(): void {
@@ -206,13 +169,13 @@ export class ConsoleComponent implements OnInit {
       params = params.set('ip', ip);
     }
 
-    this.http.get<AuditLog[]>('/api/audit', { params }).subscribe({
+    this.http.get<AuditLog[]>(`${this.apiBaseUrl}/audit`, { params }).subscribe({
       next: (data) => {
         this.auditLogs = data;
         this.error = '';
       },
       error: () => {
-        this.error = 'Failed to load audit logs.';
+        this.showError('Failed to load audit logs.');
       }
     });
   }
@@ -222,134 +185,110 @@ export class ConsoleComponent implements OnInit {
     this.fetchAuditLogs();
   }
 
-  logLoginAttempt(): void {
-    const params = new HttpParams()
-      .set('success', String(this.loginMonitor.success))
-      .set('ip', this.loginMonitor.ip || '127.0.0.1');
-
-    this.http.post('/api/vault/monitor/login', null, { params, responseType: 'text' }).subscribe({
-      next: (res) => {
-        this.message = res;
-        this.error = '';
-        this.fetchAuditLogs();
-        this.fetchDashboard();
-      },
-      error: () => {
-        this.error = 'Failed to log login event.';
-      }
-    });
+  toggleBackupContent(): void {
+    this.showBackupContent = !this.showBackupContent;
   }
 
-  logMasterPasswordChange(): void {
-    const params = new HttpParams().set('ip', this.loginMonitor.ip || '127.0.0.1');
-    this.http.post('/api/vault/monitor/master-password-change', null, { params, responseType: 'text' }).subscribe({
-      next: (res) => {
-        this.message = res;
-        this.error = '';
-        this.fetchAuditLogs();
-        this.fetchDashboard();
-      },
-      error: () => {
-        this.error = 'Failed to log master password change.';
-      }
-    });
+  toggleTechnicalDetails(): void {
+    this.showTechnicalDetails = !this.showTechnicalDetails;
   }
 
   exportBackup(): void {
     this.loading = true;
-    this.http.get('/api/backup/export', { responseType: 'text' }).subscribe({
+    this.http.get(`${this.apiBaseUrl}/backup/export`, { responseType: 'text' }).subscribe({
       next: (data) => {
         this.backupExport = data;
         this.backupContent = data;
         this.loading = false;
-        this.message = 'Backup exported.';
-        this.error = '';
+        this.showSuccess('Backup exported.');
         this.fetchAuditLogs();
         this.fetchDashboard();
         this.fetchLatestBackupInfo();
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = 'Failed to export backup.';
+        this.showError(this.extractErrorMessage(err, 'Failed to export backup.'));
       }
     });
   }
 
   validateBackup(): void {
-    if (!this.ensureBackupContent('validate')) {
+    const normalizedContent = this.normalizeBackupContent('validate');
+    if (!normalizedContent) {
       return;
     }
-    this.http.patch<BackupValidateResponse>('/api/backup/validate', { fileContent: this.backupContent }).subscribe({
+    this.http.patch<BackupValidateResponse>(`${this.apiBaseUrl}/backup/validate`, { fileContent: normalizedContent }).subscribe({
       next: (res) => {
         this.backupValidationResult = res;
         this.backupUpdateResult = null;
-        this.message = `${res.message} (checksum: ${res.checksum.slice(0, 12)}...)`;
-        this.error = '';
+        this.showSuccess('Backup content validated.');
         this.fetchAuditLogs();
         this.fetchDashboard();
       },
-      error: () => {
-        this.error = 'Backup validation failed.';
+      error: (err: HttpErrorResponse) => {
+        this.showError(this.extractErrorMessage(err, 'Backup validation failed.'));
       }
     });
   }
 
   restoreBackup(): void {
-    if (!this.ensureBackupContent('restore')) {
+    const normalizedContent = this.normalizeBackupContent('restore');
+    if (!normalizedContent) {
       return;
     }
-    this.http.post('/api/backup/restore', { fileContent: this.backupContent }, { responseType: 'text' }).subscribe({
+    this.http.post(`${this.apiBaseUrl}/backup/restore`, { fileContent: normalizedContent }, { responseType: 'text' }).subscribe({
       next: (res) => {
-        this.message = `Restore result: ${res}`;
-        this.error = '';
-        this.fetchEntries();
-        this.fetchAuditLogs();
-        this.fetchDashboard();
+        const parsed = this.parseRestoreResponse(res);
+        const restoreMessage = parsed.restoredEntries > -1
+          ? `${parsed.message}. Restored entries: ${parsed.restoredEntries}.`
+          : parsed.message;
+        this.showSuccess(restoreMessage);
+        this.revealedPasswords = {};
+        this.refreshAll();
       },
-      error: () => {
-        this.error = 'Failed to restore backup.';
+      error: (err: HttpErrorResponse) => {
+        this.showError(this.extractErrorMessage(err, 'Failed to restore backup.'));
       }
     });
   }
 
   updateBackup(): void {
-    if (!this.ensureBackupContent('update')) {
+    const normalizedContent = this.normalizeBackupContent('update');
+    if (!normalizedContent) {
       return;
     }
-    this.http.put<BackupUpdateResponse>('/api/backup/update', { fileContent: this.backupContent }).subscribe({
+    this.http.put<BackupUpdateResponse>(`${this.apiBaseUrl}/backup/update`, { fileContent: normalizedContent }).subscribe({
       next: (res) => {
         this.backupUpdateResult = res;
         this.backupValidationResult = null;
-        this.message = `${res.message} (${res.fileName})`;
-        this.error = '';
+        this.showSuccess(`${res.message} (${res.fileName})`);
         this.fetchLatestBackupInfo();
         this.fetchAuditLogs();
         this.fetchDashboard();
       },
-      error: () => {
-        this.error = 'Failed to update backup.';
+      error: (err: HttpErrorResponse) => {
+        this.showError(this.extractErrorMessage(err, 'Failed to update backup.'));
       }
     });
   }
 
   deleteBackup(): void {
-    this.http.delete('/api/backup/delete', { responseType: 'text' }).subscribe({
+    this.http.delete(`${this.apiBaseUrl}/backup/delete`, { responseType: 'text' }).subscribe({
       next: (res) => {
-        this.message = res;
-        this.error = '';
+        this.showSuccess(res);
         this.backupUpdateResult = null;
         this.fetchLatestBackupInfo();
         this.fetchAuditLogs();
         this.fetchDashboard();
       },
-      error: () => {
-        this.error = 'Failed to delete backup.';
+      error: (err: HttpErrorResponse) => {
+        this.showError(this.extractErrorMessage(err, 'Failed to delete backup.'));
       }
     });
   }
 
   fetchLatestBackupInfo(): void {
-    this.http.get<LatestBackupInfo>('/api/backup/latest').subscribe({
+    this.http.get<LatestBackupInfo>(`${this.apiBaseUrl}/backup/latest`).subscribe({
       next: (data) => {
         this.latestBackupInfo = data;
       },
@@ -359,11 +298,134 @@ export class ConsoleComponent implements OnInit {
     });
   }
 
-  private ensureBackupContent(action: string): boolean {
-    if (this.backupContent.trim()) {
-      return true;
+  openMasterPasswordModal(entry: VaultEntry, action: 'view' | 'delete'): void {
+    this.selectedEntry = entry;
+    this.masterAction = action;
+    this.masterPasswordInput = '';
+    this.processingMasterAction = false;
+    this.error = '';
+  }
+
+  closeMasterPasswordModal(): void {
+    this.selectedEntry = null;
+    this.masterAction = null;
+    this.masterPasswordInput = '';
+    this.processingMasterAction = false;
+  }
+
+  submitMasterPasswordAction(): void {
+    if (!this.selectedEntry || !this.masterAction) {
+      return;
     }
-    this.error = `Paste backup content in the textarea before ${action}.`;
-    return false;
+
+    const masterPassword = this.masterPasswordInput.trim();
+    if (!masterPassword) {
+      this.showWarning('Master password is required.');
+      return;
+    }
+
+    this.processingMasterAction = true;
+    if (this.masterAction === 'view') {
+      this.vaultApi.verifyAndGet(this.selectedEntry.id, masterPassword).subscribe({
+        next: (viewedEntry) => {
+          this.revealedPasswords[viewedEntry.id] = viewedEntry.password;
+          this.closeMasterPasswordModal();
+          this.showSuccess('Password revealed successfully.');
+          this.fetchAuditLogs();
+          this.fetchDashboard();
+        },
+        error: () => {
+          this.processingMasterAction = false;
+          this.showError('Failed to view vault entry. Check master password.');
+        }
+      });
+      return;
+    }
+
+    this.vaultApi.deleteEntry(this.selectedEntry.id, masterPassword).subscribe({
+      next: () => {
+        delete this.revealedPasswords[this.selectedEntry!.id];
+        this.showSuccess('Vault entry deleted.');
+        this.closeMasterPasswordModal();
+        this.fetchEntries();
+        this.fetchAuditLogs();
+        this.fetchDashboard();
+      },
+      error: () => {
+        this.processingMasterAction = false;
+        this.showError('Failed to delete vault entry. Check master password.');
+      }
+    });
+  }
+
+  private normalizeBackupContent(action: string): string | null {
+    const normalized = this.backupContent.replace(/\s+/g, '').trim();
+    if (normalized) {
+      this.backupContent = normalized;
+      return normalized;
+    }
+    this.showWarning(`Paste backup content in the textarea before ${action}.`);
+    return null;
+  }
+
+  private extractErrorMessage(error: HttpErrorResponse, fallback: string): string {
+    if (!error) {
+      return fallback;
+    }
+
+    if (typeof error.error === 'string' && error.error.trim()) {
+      return error.error;
+    }
+
+    if (error.error && typeof error.error === 'object' && 'message' in error.error) {
+      const message = (error.error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim()) {
+        return message;
+      }
+    }
+
+    if (typeof error.message === 'string' && error.message.trim()) {
+      return error.message;
+    }
+
+    return fallback;
+  }
+
+  private parseRestoreResponse(raw: string): BackupRestoreResponse {
+    const text = (raw ?? '').trim();
+    if (!text) {
+      return { message: 'Backup restored successfully', restoredEntries: -1, restoredAt: '' };
+    }
+
+    try {
+      const payload = JSON.parse(text) as Partial<BackupRestoreResponse>;
+      return {
+        message: typeof payload.message === 'string' && payload.message.trim() ? payload.message : 'Backup restored successfully',
+        restoredEntries: typeof payload.restoredEntries === 'number' ? payload.restoredEntries : -1,
+        restoredAt: typeof payload.restoredAt === 'string' ? payload.restoredAt : ''
+      };
+    } catch {
+      return {
+        message: text,
+        restoredEntries: -1,
+        restoredAt: ''
+      };
+    }
+  }
+
+  private showSuccess(text: string): void {
+    this.message = text;
+    this.error = '';
+    this.notifications.show({ type: 'success', text });
+  }
+
+  private showError(text: string): void {
+    this.error = text;
+    this.notifications.show({ type: 'error', text });
+  }
+
+  private showWarning(text: string): void {
+    this.error = text;
+    this.notifications.show({ type: 'warning', text });
   }
 }

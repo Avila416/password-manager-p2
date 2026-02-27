@@ -210,6 +210,28 @@ pre {
   color: #425f6c;
 }
 
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  width: min(430px, 100%);
+  border: 1px solid #b7d8dd;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
 @media (max-width: 960px) {
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));

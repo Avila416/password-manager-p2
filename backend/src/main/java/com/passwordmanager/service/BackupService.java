@@ -6,7 +6,7 @@ public interface BackupService {
 
     String exportBackup();
 
-    String restoreBackup(String fileContent);
+    Map<String, Object> restoreBackup(String fileContent);
 
     Map<String, Object> updateBackup(String fileContent);
 

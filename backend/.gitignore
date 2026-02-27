@@ -2,3 +2,9 @@
 
 # Compiled output
 /target
+
+# Runtime logs
+backend-run.log
+
+# Local backup artifacts
+backup/

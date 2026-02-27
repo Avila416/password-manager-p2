@@ -7,7 +7,7 @@ import { readAuthToken } from '../auth/token.util';
 export class AuthTokenInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = readAuthToken();
-    const isApiRequest = req.url.startsWith('/api/');
+    const isApiRequest = req.url.startsWith('/api/') || req.url.includes('/api/');
 
     if (!token || !isApiRequest) {
       return next.handle(req);

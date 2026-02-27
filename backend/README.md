@@ -1,87 +1,25 @@
-# Dashboard, Backup & Audit Monitoring Module
+Spring Boot backend for password manager module.
 
-This Spring Boot module implements:
-- Dashboard vault summary metrics
-- Encrypted backup export/restore with integrity validation
-- Sensitive-operation audit monitoring with traceable IP/timestamp/action
-- Integration tests for core module behavior
+## Database (MySQL)
 
-## Implemented Features
+The app now uses MySQL instead of H2.
 
-### Dashboard
-- `GET /api/dashboard`
-- Returns:
-  - `totalPasswords`
-  - `weakPasswords`
-  - `recentPasswords` (last 7 days)
-  - `actionStats` map for lightweight graph/stat support
+Set these environment variables before starting:
 
-### Backup & Restore
-- `GET /api/backup/export`
-  - Exports encrypted backup payload
-  - Persists backup metadata in DB
-  - Logs `BACKUP_EXPORT`
-- `PATCH /api/backup/validate`
-  - Validates backup payload format and checksum integrity
-- `POST /api/backup/restore`
-  - Validates then decrypts payload
-- `PUT /api/backup/update`
-  - Updates latest backup record with new encrypted payload
-- `DELETE /api/backup/delete`
-  - Deletes latest backup record
+- `DB_HOST` (default: `localhost`)
+- `DB_PORT` (default: `3306`)
+- `DB_NAME` (default: `vault_db`)
+- `DB_USER` (default: `root`)
+- `DB_PASSWORD` (default: `root`)
 
-Backup payload format:
-- `<sha256(encryptedData)>.<encryptedData>`
+Example (PowerShell):
 
-### Logging & Monitoring
-- Audit log entity captures:
-  - Action type
-  - Simulated IP
-  - Status
-  - Timestamp
-- Sensitive operations logged:
-  - `LOGIN_ATTEMPT`
-  - `FAILED_LOGIN_ATTEMPT`
-  - `MASTER_PASSWORD_CHANGE`
-  - `PASSWORD_VIEW`
-  - `DELETE_ENTRY`
-  - `BACKUP_EXPORT`
-- Audit view endpoint:
-  - `GET /api/audit`
-  - Optional filters: `action`, `status`, `ip`
+```powershell
+$env:DB_HOST="localhost"
+$env:DB_PORT="3306"
+$env:DB_NAME="vault_db"
 
-### Monitoring/Vault Endpoints
-- `POST /api/vault/monitor/login?success=true|false&ip=...`
-- `POST /api/vault/monitor/master-password-change?ip=...`
-- `GET /api/vault/entries/{id}?ip=...` (logs password view)
-- `DELETE /api/vault/entries/{id}?ip=...` (logs delete entry)
-- `GET /api/vault/entries`
-- `POST /api/vault/entries`
-
-## Integration Testing
-- Integration test class:
-  - `src/test/java/com/passwordmanager/integration/ModuleIntegrationTest.java`
-- Covers:
-  - Dashboard summary counts
-  - Backup export/validate/restore flow
-  - Sensitive operations audit trail
-
-## Documentation Artifacts
-- ERD: `docs/ERD.md`
-- Architecture diagram: `docs/ARCHITECTURE.md`
-
-## Run
-
-```bash
-mvn clean test
+$env:DB_USER="root"
+$env:DB_PASSWORD="root"
+mvn spring-boot:run
 ```
-
-## MySQL Configuration
-
-The backend now uses MySQL (not H2). Default datasource values:
-
-- `DB_URL=jdbc:mysql://localhost:3306/vaultdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC`
-- `DB_USERNAME=root`
-- `DB_PASSWORD=root`
-
-You can override these with environment variables before running the app.

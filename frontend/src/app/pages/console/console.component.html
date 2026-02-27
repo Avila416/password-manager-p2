@@ -1,7 +1,7 @@
 <main class="page">
   <header class="hero">
-    <h1>Password Manager Console</h1>
-    <p>Manage vault entries, backup lifecycle, and security activity from one screen.</p>
+    <h1>Backup Operations</h1>
+    <p>Manage backup lifecycle with live vault entries and audit visibility in one place.</p>
     <button class="btn" (click)="refreshAll()">Refresh</button>
     <p class="hero-refresh-time" *ngIf="lastRefreshedAt">Last refreshed: {{ lastRefreshedAt }}</p>
   </header>
@@ -34,30 +34,9 @@
     </article>
   </section>
 
-  <section class="grid">
-    <article class="card">
-      <h2>Add Vault Entry</h2>
-      <form (ngSubmit)="addEntry()" class="stack">
-        <label>
-          Title
-          <input type="text" name="title" [(ngModel)]="newEntry.title" />
-        </label>
-        <label>
-          Username
-          <input type="text" name="username" [(ngModel)]="newEntry.username" />
-        </label>
-        <label>
-          Password
-          <input type="text" name="password" [(ngModel)]="newEntry.password" />
-        </label>
-        <button class="btn" type="submit">Create Entry</button>
-      </form>
-    </article>
-
-  </section>
-
   <section id="vault" class="card">
-    <h2>Vault Entries</h2>
+    <h2>Vault Entries (Auto Synced)</h2>
+    <p class="help">This table automatically reflects entries from the Vault module.</p>
     <div class="table-wrap">
       <table>
         <thead>
@@ -85,6 +64,9 @@
               </span>
             </td>
           </tr>
+          <tr *ngIf="entries.length === 0">
+            <td colspan="5">No vault entries found.</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -105,28 +87,37 @@
         <button class="btn" (click)="validateBackup()" [disabled]="!backupContent.trim()">Validate</button>
         <button class="btn" (click)="updateBackup()" [disabled]="!backupContent.trim()">Update</button>
         <button class="btn" (click)="restoreBackup()" [disabled]="!backupContent.trim()">Restore</button>
+        <button class="btn ghost" (click)="toggleBackupContent()">
+          {{ showBackupContent ? 'Hide Backup Content' : 'Show Backup Content' }}
+        </button>
+        <button class="btn ghost" (click)="toggleTechnicalDetails()">
+          {{ showTechnicalDetails ? 'Hide Technical Details' : 'Show Technical Details' }}
+        </button>
         <button class="btn danger" (click)="deleteBackup()">Delete</button>
       </div>
-      <label>
+      <p class="help" *ngIf="!showBackupContent">
+        Backup content is hidden by default. Use <strong>Show Backup Content</strong> only for manual restore/update flows.
+      </p>
+      <label *ngIf="showBackupContent">
         Backup Content
         <textarea [(ngModel)]="backupContent" name="backupContent" rows="7"
           placeholder="Paste backup payload here, then Validate/Update/Restore"></textarea>
       </label>
-      <div class="muted" *ngIf="backupValidationResult">
+      <div class="muted" *ngIf="showTechnicalDetails && backupValidationResult">
         <p><strong>Validation:</strong> {{ backupValidationResult.message }}</p>
         <p>Checksum: <code>{{ backupValidationResult.checksum }}</code></p>
         <p>Encrypted length: {{ backupValidationResult.encryptedLength }} chars</p>
         <p>Payload length: {{ backupValidationResult.payloadLength }} chars</p>
         <p>Validated at: {{ backupValidationResult.validatedAt | date: 'medium' }}</p>
       </div>
-      <div class="muted" *ngIf="backupUpdateResult">
+      <div class="muted" *ngIf="showTechnicalDetails && backupUpdateResult">
         <p><strong>Update:</strong> {{ backupUpdateResult.message }}</p>
         <p>File: <strong>{{ backupUpdateResult.fileName }}</strong></p>
         <p>Checksum: <code>{{ backupUpdateResult.checksum }}</code></p>
         <p>Payload length: {{ backupUpdateResult.payloadLength }} chars</p>
         <p>Updated at: {{ backupUpdateResult.updatedAt | date: 'medium' }}</p>
       </div>
-      <div class="muted" *ngIf="latestBackupInfo">
+      <div class="muted" *ngIf="showTechnicalDetails && latestBackupInfo">
         <p *ngIf="latestBackupInfo.exists">
           Latest backup file: <strong>{{ latestBackupInfo.fileName }}</strong><br />
           Path: <code>{{ latestBackupInfo.filePath }}</code>
@@ -135,6 +126,9 @@
           Latest backup file path is not available yet. Export once to create it.
         </p>
       </div>
+      <p class="help" *ngIf="!showTechnicalDetails">
+        Technical details (checksum, payload length, file path) are hidden by default.
+      </p>
     </article>
 
     <article id="audit" class="card">
@@ -167,6 +161,28 @@
         </table>
       </div>
     </article>
+  </section>
+
+  <section class="modal" *ngIf="selectedEntry && masterAction">
+    <div class="modal-content">
+      <h3>{{ masterAction === 'view' ? 'Verify Master Password' : 'Security Verification' }}</h3>
+      <p>
+        {{ masterAction === 'view' ? 'Enter master password to reveal this entry.' : 'Enter master password to delete this entry.' }}
+      </p>
+      <p><strong>Entry:</strong> {{ selectedEntry.title || '(No title)' }}</p>
+      <input
+        type="password"
+        [(ngModel)]="masterPasswordInput"
+        placeholder="Master password"
+        name="backupOpsMasterPassword"
+      />
+      <div class="inline-actions">
+        <button class="btn ghost" type="button" (click)="closeMasterPasswordModal()">Cancel</button>
+        <button class="btn" type="button" (click)="submitMasterPasswordAction()" [disabled]="processingMasterAction">
+          {{ processingMasterAction ? 'Processing...' : 'Submit' }}
+        </button>
+      </div>
+    </div>
   </section>
 
 </main>

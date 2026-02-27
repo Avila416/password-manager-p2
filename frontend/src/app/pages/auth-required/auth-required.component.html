@@ -1,13 +1,13 @@
 <section class="auth-required">
   <h2>Authentication Required</h2>
-  <p>You need a valid token from Module 1 login to use Module 4.</p>
+  <p>You need a token in this browser origin to access these pages.</p>
   <ol>
-    <li>Login in Module 1 frontend on <code>http://localhost:4200/login</code>.</li>
-    <li>Ensure token is stored in local storage key <code>pm_token</code> (or token/access_token).</li>
-    <li>Return to <a routerLink="/console">Console</a>.</li>
+    <li>Use this app's login page, or click demo access below.</li>
+    <li>Token must exist in local storage as <code>pm_token</code> (or legacy token keys).</li>
+    <li>Then open <a routerLink="/generator">Generator</a> or <a routerLink="/vault">Vault</a>.</li>
   </ol>
-  <p>
-    For local review/demo:
+  <div class="actions">
+    <button type="button" (click)="openLogin()">Open Login</button>
     <button type="button" (click)="useDemoAccess()">Use Demo Access</button>
-  </p>
+  </div>
 </section>

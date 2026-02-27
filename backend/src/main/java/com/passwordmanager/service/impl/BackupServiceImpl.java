@@ -3,14 +3,14 @@ package com.passwordmanager.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.passwordmanager.entity.BackupFile;
-import com.passwordmanager.entity.VaultEntry;
+import com.passwordmanager.entity.PasswordEntry;
 import com.passwordmanager.exception.BackupException;
 import com.passwordmanager.repository.BackupFileRepository;
-import com.passwordmanager.repository.VaultEntryRepository;
+import com.passwordmanager.repository.PasswordEntryRepository;
 import com.passwordmanager.service.AuditService;
 import com.passwordmanager.service.BackupService;
 import com.passwordmanager.util.AuditActions;
-import com.passwordmanager.util.EncryptionUtil;
+import com.passwordmanager.security.EncryptionUtil;
 import com.passwordmanager.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,7 +26,6 @@ import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ import java.util.Map;
 public class BackupServiceImpl implements BackupService {
 
     private final BackupFileRepository backupFileRepository;
-    private final VaultEntryRepository vaultEntryRepository;
+    private final PasswordEntryRepository passwordEntryRepository;
     private final EncryptionUtil encryptionUtil;
     private final FileUtil fileUtil;
     private final AuditService auditService;
@@ -44,7 +43,7 @@ public class BackupServiceImpl implements BackupService {
     private final String backupStoragePath;
 
     public BackupServiceImpl(BackupFileRepository backupFileRepository,
-                             VaultEntryRepository vaultEntryRepository,
+                             PasswordEntryRepository passwordEntryRepository,
                              EncryptionUtil encryptionUtil,
                              FileUtil fileUtil,
                              AuditService auditService,
@@ -52,7 +51,7 @@ public class BackupServiceImpl implements BackupService {
                              JdbcTemplate jdbcTemplate,
                              @Value("${backup.storage.path:backup}") String backupStoragePath) {
         this.backupFileRepository = backupFileRepository;
-        this.vaultEntryRepository = vaultEntryRepository;
+        this.passwordEntryRepository = passwordEntryRepository;
         this.encryptionUtil = encryptionUtil;
         this.fileUtil = fileUtil;
         this.auditService = auditService;
@@ -83,47 +82,66 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     @Transactional
-    public String restoreBackup(String fileContent) {
+    public Map<String, Object> restoreBackup(String fileContent) {
         if (!isValidPayload(fileContent)) {
             auditService.log(AuditActions.BACKUP_RESTORE, "127.0.0.1", "FAILED");
             throw new BackupException("Invalid backup content");
         }
         String encrypted = getEncryptedSegment(fileContent);
+        String decrypted;
         try {
-            String decrypted = encryptionUtil.decrypt(encrypted);
-            restoreVaultSnapshot(decrypted);
-            auditService.log(AuditActions.BACKUP_RESTORE, "127.0.0.1", "SUCCESS");
-            return "Backup restored successfully";
+            decrypted = encryptionUtil.decrypt(encrypted);
         } catch (Exception ex) {
             auditService.log(AuditActions.BACKUP_RESTORE, "127.0.0.1", "FAILED");
             throw new BackupException("Unable to decrypt backup content");
         }
+
+        int restoredEntries = restoreVaultSnapshot(decrypted);
+        auditService.log(AuditActions.BACKUP_RESTORE, "127.0.0.1", "SUCCESS");
+        return Map.of(
+                "message", "Backup restored successfully",
+                "restoredEntries", restoredEntries,
+                "restoredAt", LocalDateTime.now().toString()
+        );
     }
 
     private String serializeVaultSnapshot() {
         try {
-            List<VaultEntry> entries = vaultEntryRepository.findAll();
+            List<PasswordEntry> entries = passwordEntryRepository.findAll();
             return objectMapper.writeValueAsString(entries);
         } catch (Exception ex) {
             throw new BackupException("Unable to generate backup payload");
         }
     }
 
-    private void restoreVaultSnapshot(String decryptedPayload) {
+    private int restoreVaultSnapshot(String decryptedPayload) {
         try {
-            List<VaultEntry> entries = objectMapper.readValue(
+            List<PasswordEntry> entries = objectMapper.readValue(
                     decryptedPayload,
-                    new TypeReference<List<VaultEntry>>() {
+                    new TypeReference<List<PasswordEntry>>() {
                     }
             );
-            jdbcTemplate.execute("TRUNCATE TABLE vault_entry");
+            jdbcTemplate.execute("TRUNCATE TABLE password_entry");
             entries.forEach(entry -> {
                 entry.setId(null);
                 if (entry.getCreatedAt() == null) {
                     entry.setCreatedAt(LocalDateTime.now());
                 }
+                if (entry.getFavorite() == null) {
+                    entry.setFavorite(false);
+                }
+                if (entry.getTitle() == null) {
+                    entry.setTitle("");
+                }
+                if (entry.getWebsite() == null) {
+                    entry.setWebsite("");
+                }
+                if (entry.getCategory() == null || entry.getCategory().isBlank()) {
+                    entry.setCategory("OTHER");
+                }
             });
-            vaultEntryRepository.saveAll(entries);
+            passwordEntryRepository.saveAll(entries);
+            return entries.size();
         } catch (Exception ex) {
             throw new BackupException("Unable to restore vault entries from backup content");
         }
@@ -232,12 +250,17 @@ public class BackupServiceImpl implements BackupService {
         if (!fileUtil.validate(checksum) || !fileUtil.validate(encrypted)) {
             return false;
         }
-        try {
-            Base64.getDecoder().decode(encrypted);
-        } catch (IllegalArgumentException ex) {
+        if (!checksum.equals(sha256(encrypted))) {
             return false;
         }
-        return checksum.equals(sha256(encrypted));
+
+        // Supports both legacy base64 payloads and current versioned payloads (e.g. v1:...).
+        try {
+            encryptionUtil.decrypt(encrypted);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     private String getChecksumSegment(String fileContent) {
