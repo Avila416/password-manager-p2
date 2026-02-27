@@ -8,6 +8,9 @@
     body { font-family: Segoe UI, Arial, sans-serif; margin: 12px; width: 320px; }
     h1 { font-size: 16px; margin: 0 0 8px; }
     .muted { color: #666; font-size: 12px; margin-bottom: 8px; }
+    .field { margin: 8px 0; }
+    .field label { display: block; font-size: 12px; margin-bottom: 4px; color: #444; }
+    .field input { width: 100%; box-sizing: border-box; border: 1px solid #d0d5dd; border-radius: 6px; padding: 7px 8px; }
     .item { border: 1px solid #ddd; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
     .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     button { background: #0d6efd; color: #fff; border: 0; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
@@ -18,6 +21,10 @@
 <body>
   <h1>Fill Credentials</h1>
   <div id="domain" class="muted"></div>
+  <div class="field">
+    <label for="masterPassword">Master Password (required if stored value is encrypted)</label>
+    <input id="masterPassword" type="password" placeholder="Enter master password">
+  </div>
   <div id="status" class="muted">Loading...</div>
   <div id="results"></div>
   <script src="popup.js"></script>

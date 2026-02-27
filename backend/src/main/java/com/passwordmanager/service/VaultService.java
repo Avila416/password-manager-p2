@@ -32,9 +32,10 @@ public class VaultService {
 
     public PasswordEntryResponseDTO addEntry(PasswordEntryRequestDTO dto) {
         String encryptedPassword = encryptionUtil.encrypt(dto.getPassword());
+        String normalizedTitle = normalizeTitle(dto.getTitle(), dto.getUsername());
         PasswordEntry saved = passwordEntryRepository.save(
                 PasswordEntry.builder()
-                        .title(dto.getTitle() == null ? "" : dto.getTitle().trim())
+                        .title(normalizedTitle)
                         .username(dto.getUsername())
                         .encryptedPassword(encryptedPassword)
                         .website(dto.getWebsite() == null ? "" : dto.getWebsite().trim())
@@ -59,7 +60,7 @@ public class VaultService {
                 .orElseThrow(() -> new InvalidInputException("Entry not found"));
 
         entry.setUsername(dto.getUsername());
-        entry.setTitle(dto.getTitle() == null ? "" : dto.getTitle().trim());
+        entry.setTitle(normalizeTitle(dto.getTitle(), dto.getUsername()));
         entry.setWebsite(dto.getWebsite() == null ? "" : dto.getWebsite().trim());
         entry.setCategory(dto.getCategory() == null || dto.getCategory().isBlank() ? "OTHER" : dto.getCategory().trim());
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
@@ -86,7 +87,7 @@ public class VaultService {
         }
         PasswordEntry entry = passwordEntryRepository.findById(id)
                 .orElseThrow(() -> new InvalidInputException("Entry not found"));
-        return toVaultResponse(entry);
+        return toVaultRevealResponse(entry);
     }
 
     @Transactional
@@ -175,10 +176,27 @@ public class VaultService {
     }
 
     private PasswordEntryResponseDTO toVaultResponse(PasswordEntry entry) {
-        String decryptedPassword = encryptionUtil.decrypt(entry.getEncryptedPassword());
+        String normalizedStoredPassword = normalizeStoredPassword(entry);
+        String decryptedPassword = encryptionUtil.decrypt(normalizedStoredPassword);
         return PasswordEntryResponseDTO.builder()
                 .id(entry.getId())
-                .title(entry.getTitle() == null ? "" : entry.getTitle())
+                .title(normalizeTitle(entry.getTitle(), entry.getUsername()))
+                .username(entry.getUsername())
+                .website(entry.getWebsite() == null ? "" : entry.getWebsite())
+                .category(entry.getCategory() == null || entry.getCategory().isBlank() ? "OTHER" : entry.getCategory())
+                .favorite(Boolean.TRUE.equals(entry.getFavorite()))
+                .password(normalizedStoredPassword)
+                .strength(strengthService.checkStrength(decryptedPassword))
+                .createdAt(entry.getCreatedAt())
+                .build();
+    }
+
+    private PasswordEntryResponseDTO toVaultRevealResponse(PasswordEntry entry) {
+        String normalizedStoredPassword = normalizeStoredPassword(entry);
+        String decryptedPassword = encryptionUtil.decrypt(normalizedStoredPassword);
+        return PasswordEntryResponseDTO.builder()
+                .id(entry.getId())
+                .title(normalizeTitle(entry.getTitle(), entry.getUsername()))
                 .username(entry.getUsername())
                 .website(entry.getWebsite() == null ? "" : entry.getWebsite())
                 .category(entry.getCategory() == null || entry.getCategory().isBlank() ? "OTHER" : entry.getCategory())
@@ -187,5 +205,37 @@ public class VaultService {
                 .strength(strengthService.checkStrength(decryptedPassword))
                 .createdAt(entry.getCreatedAt())
                 .build();
+    }
+
+    private String normalizeStoredPassword(PasswordEntry entry) {
+        String stored = entry.getEncryptedPassword();
+        if (stored == null || stored.isBlank()) {
+            return "";
+        }
+
+        if (stored.startsWith("v1:")) {
+            return stored;
+        }
+
+        // Legacy/plain values are migrated to encrypted format on read.
+        String legacyPlain = encryptionUtil.decrypt(stored);
+        if (legacyPlain == null || legacyPlain.isBlank()) {
+            legacyPlain = stored;
+        }
+
+        String migrated = encryptionUtil.encrypt(legacyPlain);
+        entry.setEncryptedPassword(migrated);
+        passwordEntryRepository.save(entry);
+        return migrated;
+    }
+
+    private String normalizeTitle(String title, String username) {
+        if (title != null && !title.trim().isEmpty()) {
+            return title.trim();
+        }
+        if (username != null && !username.trim().isEmpty()) {
+            return username.trim();
+        }
+        return "";
     }
 }
