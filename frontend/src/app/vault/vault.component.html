@@ -81,7 +81,8 @@
   <section class="modal" *ngIf="deleteEntryTarget">
     <div class="modal-content">
       <h3>Security Verification</h3>
-      <p>Please enter your master password</p>
+      <p>Please enter your master password to delete this entry.</p>
+      <p class="hint"><em>Note: A valid backup must exist before deletion. Export through Backup Operations first.</em></p>
       <input
         type="password"
         [(ngModel)]="deleteMasterPassword"

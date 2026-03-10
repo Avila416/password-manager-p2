@@ -210,6 +210,12 @@ pre {
   color: #425f6c;
 }
 
+.hint {
+  color: #6a7a82;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
 .modal {
   position: fixed;
   inset: 0;

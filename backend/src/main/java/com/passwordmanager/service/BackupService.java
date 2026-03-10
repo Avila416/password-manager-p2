@@ -12,7 +12,15 @@ public interface BackupService {
 
     Map<String, Object> validateBackup(String fileContent);
 
+    Map<String, Object> validateAndRestoreBackup(String fileContent);
+
+    Map<String, Object> updateAndRestoreBackup(String fileContent);
+
     String deleteBackup();
 
     Map<String, Object> latestBackupInfo();
+
+    boolean hasValidBackup();
+
+    String getLatestBackupContent();
 }

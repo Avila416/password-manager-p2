@@ -5,6 +5,7 @@ import com.passwordmanager.dto.PasswordEntryResponseDTO;
 import com.passwordmanager.dto.SearchFilterDTO;
 import com.passwordmanager.dto.UpdatePasswordEntryDTO;
 import com.passwordmanager.entity.PasswordEntry;
+import com.passwordmanager.exception.BackupRequiredException;
 import com.passwordmanager.exception.InvalidInputException;
 import com.passwordmanager.exception.UnauthorizedAccessException;
 import com.passwordmanager.repository.PasswordEntryRepository;
@@ -29,6 +30,7 @@ public class VaultService {
     private final PasswordStrengthService strengthService;
     private final MasterPasswordValidator masterPasswordValidator;
     private final EncryptionUtil encryptionUtil;
+    private final BackupService backupService;
 
     public PasswordEntryResponseDTO addEntry(PasswordEntryRequestDTO dto) {
         String encryptedPassword = encryptionUtil.encrypt(dto.getPassword());
@@ -77,6 +79,9 @@ public class VaultService {
         }
         if (!passwordEntryRepository.existsById(id)) {
             throw new InvalidInputException("Entry not found");
+        }
+        if (!backupService.hasValidBackup()) {
+            throw new BackupRequiredException("A valid backup is required before deleting vault entries. Please export a backup first through Backup Operations.");
         }
         passwordEntryRepository.deleteById(id);
     }

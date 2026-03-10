@@ -76,11 +76,12 @@
     <article id="backup" class="card">
       <h2>Backup Operations</h2>
       <p class="help">
-        Steps: 1) Click <strong>Export</strong> to generate backup and auto-fill content.
-        2) Click <strong>Validate</strong> to check integrity of textarea content.
-        3) Click <strong>Update</strong> to overwrite latest backup with textarea content.
-        4) Click <strong>Restore</strong> to recover vault data from this content.
+        Steps: 1) Click <strong>Export</strong> to generate backup (required before deleting any vault entry).
+        2) Click <strong>Validate</strong> to verify backup integrity and restore vault entries.
+        3) Click <strong>Update</strong> to overwrite latest backup and restore vault entries.
+        4) Click <strong>Restore</strong> to recover vault data from backup content.
         5) Click <strong>Delete</strong> to remove the latest backup file.
+        <br/><em>Note: Master password is required to view or delete vault entries.</em>
       </p>
       <div class="inline-actions">
         <button class="btn" (click)="exportBackup()" [disabled]="loading">Export</button>
@@ -169,6 +170,7 @@
       <p>
         {{ masterAction === 'view' ? 'Enter master password to reveal this entry.' : 'Enter master password to delete this entry.' }}
       </p>
+      <p *ngIf="masterAction === 'delete'" class="hint"><em>Note: A valid backup must exist before deletion. Export first if needed.</em></p>
       <p><strong>Entry:</strong> {{ selectedEntry.title || '(No title)' }}</p>
       <input
         type="password"

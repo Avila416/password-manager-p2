@@ -241,6 +241,75 @@ public class BackupServiceImpl implements BackupService {
         );
     }
 
+    @Override
+    public boolean hasValidBackup() {
+        List<BackupFile> backups = backupFileRepository.findAll();
+        if (backups.isEmpty()) {
+            return false;
+        }
+        BackupFile latest = backups.stream().max(Comparator.comparing(BackupFile::getCreatedAt)).orElse(null);
+        if (latest == null || !fileUtil.validate(latest.getEncryptedContent())) {
+            return false;
+        }
+        // Verify the backup content is valid and decryptable
+        String payload = latest.getChecksum() + "." + latest.getEncryptedContent();
+        return isValidPayload(payload);
+    }
+
+    @Override
+    public String getLatestBackupContent() {
+        List<BackupFile> backups = backupFileRepository.findAll();
+        if (backups.isEmpty()) {
+            return null;
+        }
+        BackupFile latest = backups.stream().max(Comparator.comparing(BackupFile::getCreatedAt)).orElse(null);
+        if (latest == null || !fileUtil.validate(latest.getEncryptedContent())) {
+            return null;
+        }
+        return latest.getChecksum() + "." + latest.getEncryptedContent();
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> validateAndRestoreBackup(String fileContent) {
+        // First validate the backup
+        Map<String, Object> validationResult = validateBackup(fileContent);
+
+        // Then restore the backup
+        Map<String, Object> restoreResult = restoreBackup(fileContent);
+
+        return Map.of(
+                "message", "Backup validated and restored successfully",
+                "checksum", validationResult.get("checksum"),
+                "encryptedLength", validationResult.get("encryptedLength"),
+                "payloadLength", validationResult.get("payloadLength"),
+                "validatedAt", validationResult.get("validatedAt"),
+                "restoredEntries", restoreResult.get("restoredEntries"),
+                "restoredAt", restoreResult.get("restoredAt")
+        );
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> updateAndRestoreBackup(String fileContent) {
+        // First update the backup
+        Map<String, Object> updateResult = updateBackup(fileContent);
+
+        // Then restore the backup
+        Map<String, Object> restoreResult = restoreBackup(fileContent);
+
+        return Map.of(
+                "message", "Backup updated and restored successfully",
+                "fileName", updateResult.get("fileName"),
+                "filePath", updateResult.get("filePath"),
+                "checksum", updateResult.get("checksum"),
+                "payloadLength", updateResult.get("payloadLength"),
+                "updatedAt", updateResult.get("updatedAt"),
+                "restoredEntries", restoreResult.get("restoredEntries"),
+                "restoredAt", restoreResult.get("restoredAt")
+        );
+    }
+
     private boolean isValidPayload(String fileContent) {
         if (!fileUtil.validate(fileContent) || !fileContent.contains(".")) {
             return false;

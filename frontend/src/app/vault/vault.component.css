@@ -173,3 +173,9 @@ button.danger {
   text-align: center;
   font-size: 1.4rem;
 }
+
+.hint {
+  color: #6a7a82;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}

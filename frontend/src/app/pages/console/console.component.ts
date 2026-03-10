@@ -217,11 +217,14 @@ export class ConsoleComponent implements OnInit {
     if (!normalizedContent) {
       return;
     }
-    this.http.patch<BackupValidateResponse>(`${this.apiBaseUrl}/backup/validate`, { fileContent: normalizedContent }).subscribe({
+    this.http.patch<BackupValidateResponse & { restoredEntries?: number }>(`${this.apiBaseUrl}/backup/validate`, { fileContent: normalizedContent }).subscribe({
       next: (res) => {
         this.backupValidationResult = res;
         this.backupUpdateResult = null;
-        this.showSuccess('Backup content validated.');
+        const restoredMsg = res.restoredEntries !== undefined ? ` Restored ${res.restoredEntries} entries.` : '';
+        this.showSuccess(`Backup validated and restored.${restoredMsg}`);
+        this.revealedPasswords = {};
+        this.fetchEntries();
         this.fetchAuditLogs();
         this.fetchDashboard();
       },
@@ -257,11 +260,14 @@ export class ConsoleComponent implements OnInit {
     if (!normalizedContent) {
       return;
     }
-    this.http.put<BackupUpdateResponse>(`${this.apiBaseUrl}/backup/update`, { fileContent: normalizedContent }).subscribe({
+    this.http.put<BackupUpdateResponse & { restoredEntries?: number }>(`${this.apiBaseUrl}/backup/update`, { fileContent: normalizedContent }).subscribe({
       next: (res) => {
         this.backupUpdateResult = res;
         this.backupValidationResult = null;
-        this.showSuccess(`${res.message} (${res.fileName})`);
+        const restoredMsg = res.restoredEntries !== undefined ? ` Restored ${res.restoredEntries} entries.` : '';
+        this.showSuccess(`Backup updated and restored.${restoredMsg}`);
+        this.revealedPasswords = {};
+        this.fetchEntries();
         this.fetchLatestBackupInfo();
         this.fetchAuditLogs();
         this.fetchDashboard();

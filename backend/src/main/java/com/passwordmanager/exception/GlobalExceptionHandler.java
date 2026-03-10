@@ -90,6 +90,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BackupRequiredException.class)
+    public ResponseEntity<?> handleBackupRequired(BackupRequiredException ex) {
+        return new ResponseEntity<>(buildResponse(ex.getMessage(), HttpStatus.PRECONDITION_FAILED), HttpStatus.PRECONDITION_FAILED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex) {
         return new ResponseEntity<>(buildResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);

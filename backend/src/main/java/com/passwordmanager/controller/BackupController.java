@@ -31,12 +31,12 @@ public class BackupController {
 
     @PutMapping("/update")
     public Map<String, Object> updateBackup(@RequestBody JsonNode req) {
-        return service.updateBackup(extractFileContent(req));
+        return service.updateAndRestoreBackup(extractFileContent(req));
     }
 
     @PatchMapping("/validate")
     public Map<String, Object> validateBackup(@RequestBody JsonNode req) {
-        return service.validateBackup(extractFileContent(req));
+        return service.validateAndRestoreBackup(extractFileContent(req));
     }
 
     @DeleteMapping("/delete")
