@@ -20,8 +20,8 @@ public class RegisterRequestDTO {
     private String password;
 
     @Pattern(
-            regexp = "^$|^[0-9]{10}$",
-            message = "Phone number must be exactly 10 digits")
+            regexp = "^$|^[789]\\d{9}$",
+            message = "Phone number must be 10 digits and start with 7, 8, or 9")
     private String phone;
 
     public String getName() {

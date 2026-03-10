@@ -7,6 +7,11 @@ import { AuthService, UserProfile } from '../services/auth.service';
   styleUrls: ['./master-password.component.css']
 })
 export class MasterPasswordComponent implements OnInit {
+  private readonly maxEmailLength = 255;
+  private readonly minPasswordLength = 6;
+  private readonly maxPasswordLength = 128;
+  private readonly maxVerificationCodeLength = 20;
+
   profile: UserProfile | null = null;
   accountError = '';
   setupMessage = '';
@@ -69,8 +74,13 @@ export class MasterPasswordComponent implements OnInit {
       return;
     }
 
-    if (masterPassword.length < 6) {
-      this.setupError = 'Master password must be at least 6 characters';
+    if (masterPassword.length < this.minPasswordLength) {
+      this.setupError = `Master password must be at least ${this.minPasswordLength} characters`;
+      return;
+    }
+
+    if (masterPassword.length > this.maxPasswordLength || confirmMasterPassword.length > this.maxPasswordLength) {
+      this.setupError = `Master password cannot exceed ${this.maxPasswordLength} characters`;
       return;
     }
 
@@ -104,8 +114,17 @@ export class MasterPasswordComponent implements OnInit {
       return;
     }
 
-    if (newMasterPassword.length < 6) {
-      this.changeError = 'New master password must be at least 6 characters';
+    if (newMasterPassword.length < this.minPasswordLength) {
+      this.changeError = `New master password must be at least ${this.minPasswordLength} characters`;
+      return;
+    }
+
+    if (
+      oldMasterPassword.length > this.maxPasswordLength ||
+      newMasterPassword.length > this.maxPasswordLength ||
+      confirmNewMasterPassword.length > this.maxPasswordLength
+    ) {
+      this.changeError = `Master password cannot exceed ${this.maxPasswordLength} characters`;
       return;
     }
 
@@ -180,6 +199,11 @@ export class MasterPasswordComponent implements OnInit {
       return;
     }
 
+    if (email.length > this.maxEmailLength) {
+      this.forgotError = `Email cannot exceed ${this.maxEmailLength} characters`;
+      return;
+    }
+
     this.authService.requestForgotMasterPasswordCode(email).subscribe({
       next: (resp) => {
         this.forgotMessage = resp.message;
@@ -208,8 +232,26 @@ export class MasterPasswordComponent implements OnInit {
       return;
     }
 
-    if (newMasterPassword.length < 6) {
-      this.forgotError = 'New master password must be at least 6 characters';
+    if (email.length > this.maxEmailLength) {
+      this.forgotError = `Email cannot exceed ${this.maxEmailLength} characters`;
+      return;
+    }
+
+    if (verificationCode.length > this.maxVerificationCodeLength) {
+      this.forgotError = `Verification code cannot exceed ${this.maxVerificationCodeLength} characters`;
+      return;
+    }
+
+    if (newMasterPassword.length < this.minPasswordLength) {
+      this.forgotError = `New master password must be at least ${this.minPasswordLength} characters`;
+      return;
+    }
+
+    if (
+      newMasterPassword.length > this.maxPasswordLength ||
+      confirmMasterPassword.length > this.maxPasswordLength
+    ) {
+      this.forgotError = `Master password cannot exceed ${this.maxPasswordLength} characters`;
       return;
     }
 

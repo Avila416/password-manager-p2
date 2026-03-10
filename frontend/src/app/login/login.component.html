@@ -3,17 +3,24 @@
 
   <label>
     Email
-    <input type="email" [(ngModel)]="form.email" name="email" required />
+    <input type="email" [(ngModel)]="form.email" name="email" required maxlength="255" />
   </label>
 
   <label>
     Password
-    <input type="password" [(ngModel)]="form.password" name="password" required minlength="6" />
+    <input type="password" [(ngModel)]="form.password" name="password" required minlength="6" maxlength="128" />
   </label>
 
   <label>
     OTP (if 2FA enabled)
-    <input [(ngModel)]="form.otp" name="otp" />
+    <input
+      [(ngModel)]="form.otp"
+      name="otp"
+      inputmode="numeric"
+      maxlength="6"
+      pattern="^[0-9]{6}$"
+      placeholder="6-digit code"
+    />
   </label>
 
   <div class="actions">

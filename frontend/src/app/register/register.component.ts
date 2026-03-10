@@ -8,6 +8,11 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  private readonly maxNameLength = 120;
+  private readonly maxEmailLength = 255;
+  private readonly minPasswordLength = 6;
+  private readonly maxPasswordLength = 128;
+
   form = {
     name: '',
     email: '',
@@ -34,8 +39,18 @@ export class RegisterComponent {
       return;
     }
 
+    if (name.length > this.maxNameLength) {
+      this.error = `Name cannot exceed ${this.maxNameLength} characters`;
+      return;
+    }
+
     if (!email) {
       this.error = 'Email is required';
+      return;
+    }
+
+    if (email.length > this.maxEmailLength) {
+      this.error = `Email cannot exceed ${this.maxEmailLength} characters`;
       return;
     }
 
@@ -49,13 +64,18 @@ export class RegisterComponent {
       return;
     }
 
-    if (password.length < 6) {
-      this.error = 'Password must be at least 6 characters';
+    if (password.length < this.minPasswordLength) {
+      this.error = `Password must be at least ${this.minPasswordLength} characters`;
+      return;
+    }
+
+    if (password.length > this.maxPasswordLength) {
+      this.error = `Password cannot exceed ${this.maxPasswordLength} characters`;
       return;
     }
 
     if (phone && !this.isValidPhone(phone)) {
-      this.error = 'Phone number must be exactly 10 digits';
+      this.error = 'Phone number must be 10 digits and start with 7, 8, or 9';
       return;
     }
 
@@ -100,7 +120,7 @@ export class RegisterComponent {
   }
 
   private isValidPhone(phone: string): boolean {
-    return /^\d{10}$/.test(phone);
+    return /^[789]\d{9}$/.test(phone);
   }
 }
 

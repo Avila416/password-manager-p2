@@ -8,6 +8,11 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./forgot-password.component.css']
 })
 export class ForgotPasswordComponent {
+  private readonly maxEmailLength = 255;
+  private readonly minPasswordLength = 6;
+  private readonly maxPasswordLength = 128;
+  private readonly maxVerificationCodeLength = 20;
+
   form = {
     email: '',
     verificationCode: '',
@@ -30,6 +35,10 @@ export class ForgotPasswordComponent {
     }
     if (!this.isValidEmail(email)) {
       this.error = 'Enter a valid email address';
+      return;
+    }
+    if (email.length > this.maxEmailLength) {
+      this.error = `Email cannot exceed ${this.maxEmailLength} characters`;
       return;
     }
 
@@ -58,8 +67,18 @@ export class ForgotPasswordComponent {
       return;
     }
 
+    if (email.length > this.maxEmailLength) {
+      this.error = `Email cannot exceed ${this.maxEmailLength} characters`;
+      return;
+    }
+
     if (!verificationCode) {
       this.error = 'Verification code is required';
+      return;
+    }
+
+    if (verificationCode.length > this.maxVerificationCodeLength) {
+      this.error = `Verification code cannot exceed ${this.maxVerificationCodeLength} characters`;
       return;
     }
 
@@ -68,8 +87,13 @@ export class ForgotPasswordComponent {
       return;
     }
 
-    if (newPassword.length < 6) {
-      this.error = 'New password must be at least 6 characters';
+    if (newPassword.length < this.minPasswordLength) {
+      this.error = `New password must be at least ${this.minPasswordLength} characters`;
+      return;
+    }
+
+    if (newPassword.length > this.maxPasswordLength || confirmPassword.length > this.maxPasswordLength) {
+      this.error = `Password cannot exceed ${this.maxPasswordLength} characters`;
       return;
     }
 

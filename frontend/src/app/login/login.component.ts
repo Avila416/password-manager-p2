@@ -9,6 +9,11 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  private readonly maxEmailLength = 255;
+  private readonly minPasswordLength = 6;
+  private readonly maxPasswordLength = 128;
+  private readonly otpLength = 6;
+
   form = {
     email: '',
     password: '',
@@ -30,6 +35,7 @@ export class LoginComponent {
 
     const email = this.form.email.trim();
     const password = this.form.password.trim();
+    const otp = this.form.otp.trim();
 
     if (!email) {
       this.error = 'Email is required';
@@ -41,15 +47,32 @@ export class LoginComponent {
       return;
     }
 
+    if (email.length > this.maxEmailLength) {
+      this.error = `Email cannot exceed ${this.maxEmailLength} characters`;
+      return;
+    }
+
     if (!password) {
       this.error = 'Password is required';
       return;
     }
 
-    if (password.length < 6) {
-      this.error = 'Password must be at least 6 characters';
+    if (password.length < this.minPasswordLength) {
+      this.error = `Password must be at least ${this.minPasswordLength} characters`;
       return;
     }
+
+    if (password.length > this.maxPasswordLength) {
+      this.error = `Password cannot exceed ${this.maxPasswordLength} characters`;
+      return;
+    }
+
+    if (otp && !this.isValidOtp(otp)) {
+      this.error = `OTP must be a ${this.otpLength}-digit code`;
+      return;
+    }
+
+    this.form = { email, password, otp };
 
     this.authService.login(this.form).subscribe({
       next: (resp) => {
@@ -75,6 +98,10 @@ export class LoginComponent {
       this.error = 'Enter a valid email address';
       return;
     }
+    if (email.length > this.maxEmailLength) {
+      this.error = `Email cannot exceed ${this.maxEmailLength} characters`;
+      return;
+    }
 
     this.authService.requestOtp(email).subscribe({
       next: (resp) => {
@@ -88,5 +115,9 @@ export class LoginComponent {
 
   private isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  private isValidOtp(otp: string): boolean {
+    return new RegExp(`^\\d{${this.otpLength}}$`).test(otp);
   }
 }

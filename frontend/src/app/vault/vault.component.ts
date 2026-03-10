@@ -22,6 +22,8 @@ export class VaultComponent implements OnInit {
   success = '';
 
   editingId: number | null = null;
+  editingEntry: VaultEntry | null = null;
+  showEditModal = false;
   selectedEntry: VaultEntry | null = null;
   deleteEntryTarget: VaultEntry | null = null;
   verifyMasterPassword = '';
@@ -29,6 +31,14 @@ export class VaultComponent implements OnInit {
   deleteMasterPassword = '';
 
   entryForm = this.fb.group({
+    title: [''],
+    username: ['', Validators.required],
+    password: [''],
+    website: [''],
+    category: ['OTHER']
+  });
+
+  editForm = this.fb.group({
     title: [''],
     username: ['', Validators.required],
     password: [''],
@@ -97,18 +107,14 @@ export class VaultComponent implements OnInit {
       payload.password = rawPassword;
     }
 
-    if (!this.editingId && !rawPassword) {
+    if (!rawPassword) {
       this.showWarning('Password is required for new entry');
       return;
     }
 
-    const request = this.editingId
-      ? this.api.updateEntry(this.editingId, payload)
-      : this.api.addEntry(payload);
-
-    request.subscribe({
+    this.api.addEntry(payload).subscribe({
       next: () => {
-        this.showSuccess(this.editingId ? 'Entry updated' : 'Entry added');
+        this.showSuccess('Entry added');
         this.resetForm();
         this.loadAllEntries();
         this.loadFavorites();
@@ -121,7 +127,8 @@ export class VaultComponent implements OnInit {
 
   editEntry(entry: VaultEntry): void {
     this.editingId = entry.id;
-    this.entryForm.patchValue({
+    this.editingEntry = entry;
+    this.editForm.patchValue({
       title: entry.title,
       username: entry.username,
       website: entry.website,
@@ -130,11 +137,57 @@ export class VaultComponent implements OnInit {
     });
     this.success = '';
     this.error = '';
+    this.showEditModal = true;
   }
 
   resetForm(): void {
-    this.editingId = null;
     this.entryForm.reset({ category: 'OTHER' });
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editingId = null;
+    this.editingEntry = null;
+    this.editForm.reset({ category: 'OTHER' });
+  }
+
+  saveEditEntry(): void {
+    if (!this.editingEntry || this.editingId === null) {
+      return;
+    }
+
+    this.error = '';
+    this.success = '';
+
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      this.showWarning('Fill required fields before updating');
+      return;
+    }
+
+    const payload: VaultEntryPayload = {
+      title: this.editForm.value.title || '',
+      username: this.editForm.value.username || '',
+      website: this.editForm.value.website || '',
+      category: (this.editForm.value.category as Category) || 'OTHER'
+    };
+
+    const rawPassword = this.editForm.value.password || '';
+    if (rawPassword) {
+      payload.password = rawPassword;
+    }
+
+    this.api.updateEntry(this.editingId, payload).subscribe({
+      next: () => {
+        this.showSuccess('Entry updated');
+        this.closeEditModal();
+        this.loadAllEntries();
+        this.loadFavorites();
+      },
+      error: (err) => {
+        this.showError(this.extractErrorMessage(err, 'Failed to update entry'));
+      }
+    });
   }
 
   markFavorite(entry: VaultEntry): void {

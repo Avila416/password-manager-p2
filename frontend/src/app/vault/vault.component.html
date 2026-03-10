@@ -8,7 +8,7 @@
   </header>
 
   <section class="panel">
-    <h2>{{ editingId ? 'Update Entry' : 'Add Entry' }}</h2>
+    <h2>Add Entry</h2>
     <form [formGroup]="entryForm" (ngSubmit)="saveEntry()" class="entry-form">
       <input type="text" formControlName="title" placeholder="Title" />
       <input type="text" formControlName="username" placeholder="Username / Email" />
@@ -16,9 +16,9 @@
       <select formControlName="category">
         <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
       </select>
-      <input type="text" formControlName="password" [placeholder]="editingId ? 'New password (optional)' : 'Password'" />
+      <input type="text" formControlName="password" placeholder="Password" />
       <div class="actions">
-        <button type="submit">{{ editingId ? 'Update' : 'Add' }}</button>
+        <button type="submit">Add</button>
         <button type="button" class="ghost" (click)="resetForm()">Clear</button>
       </div>
     </form>
@@ -111,6 +111,25 @@
         <button type="button" class="ghost" (click)="closeVerify()">Close</button>
       </div>
       <p *ngIf="revealedPassword"><strong>Decrypted Password:</strong> {{ revealedPassword }}</p>
+    </div>
+  </section>
+
+  <section class="modal" *ngIf="showEditModal">
+    <div class="modal-content">
+      <h3>Update Entry</h3>
+      <form [formGroup]="editForm" (ngSubmit)="saveEditEntry()" class="entry-form">
+        <input type="text" formControlName="title" placeholder="Title" />
+        <input type="text" formControlName="username" placeholder="Username / Email" />
+        <input type="text" formControlName="website" placeholder="Website" />
+        <select formControlName="category">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+        <input type="text" formControlName="password" placeholder="New password (optional)" />
+        <div class="actions">
+          <button type="submit">Update</button>
+          <button type="button" class="ghost" (click)="closeEditModal()">Cancel</button>
+        </div>
+      </form>
     </div>
   </section>
 </div>
