@@ -1,5 +1,8 @@
 package com.passwordmanager.util;
 
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public final class AuditActions {
 
     private AuditActions() {
@@ -16,3 +19,4 @@ public final class AuditActions {
     public static final String BACKUP_VALIDATE = "BACKUP_VALIDATE";
     public static final String BACKUP_DELETE = "BACKUP_DELETE";
 }
+

@@ -1,5 +1,7 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
+@Slf4j
 public class PasswordEntryResponseDTO {
     private Long id;
     private String title;
@@ -18,3 +21,4 @@ public class PasswordEntryResponseDTO {
     private String strength;
     private LocalDateTime createdAt;
 }
+

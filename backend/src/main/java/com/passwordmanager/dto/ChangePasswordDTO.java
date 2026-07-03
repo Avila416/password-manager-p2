@@ -1,8 +1,11 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class ChangePasswordDTO {
     @NotBlank(message = "Old master password is required")
     @Size(min = 6, max = 128, message = "Old master password length must be between 6 and 128")
@@ -28,3 +31,4 @@ public class ChangePasswordDTO {
         this.newMasterPassword = newMasterPassword;
     }
 }
+

@@ -1,5 +1,8 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class BackupRequest {
     private String data;
 
@@ -14,3 +17,4 @@ public class BackupRequest {
         this.data = data;
     }
 }
+

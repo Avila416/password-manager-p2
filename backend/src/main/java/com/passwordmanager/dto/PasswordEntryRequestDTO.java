@@ -1,10 +1,13 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+@Slf4j
 public class PasswordEntryRequestDTO {
 
     @NotBlank(message = "Username is required")
@@ -19,3 +22,4 @@ public class PasswordEntryRequestDTO {
     private String website;
     private String category;
 }
+

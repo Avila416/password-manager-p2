@@ -1,10 +1,13 @@
 package com.passwordmanager.util;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.security.SecureRandom;
 
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class OtpGenerator {
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -20,3 +23,4 @@ public class OtpGenerator {
         return builder.toString();
     }
 }
+

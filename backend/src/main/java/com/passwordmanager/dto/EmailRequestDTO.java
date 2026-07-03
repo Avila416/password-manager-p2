@@ -1,9 +1,12 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class EmailRequestDTO {
 
     @NotBlank(message = "Email is required")
@@ -19,3 +22,4 @@ public class EmailRequestDTO {
         this.email = email;
     }
 }
+

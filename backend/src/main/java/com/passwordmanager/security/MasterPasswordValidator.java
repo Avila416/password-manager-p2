@@ -1,5 +1,7 @@
 package com.passwordmanager.security;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.entity.User;
 import com.passwordmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MasterPasswordValidator {
 
     private final UserRepository userRepository;
@@ -38,3 +41,4 @@ public class MasterPasswordValidator {
                 .anyMatch(hash -> passwordEncoder.matches(candidate, hash));
     }
 }
+

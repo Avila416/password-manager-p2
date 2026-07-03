@@ -1,10 +1,13 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+@Slf4j
 public class SavePasswordRequest {
 
     @NotBlank(message = "Username is required")
@@ -15,3 +18,4 @@ public class SavePasswordRequest {
     @Size(min = 4, max = 256, message = "Password length must be between 4 and 256")
     private String password;
 }
+

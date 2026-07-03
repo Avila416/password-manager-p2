@@ -1,11 +1,15 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class PasswordStrengthService {
 
     public String checkStrength(String password) {
+        log.info("PasswordStrengthService.checkStrength called");
         if (password == null || password.isBlank()) {
             return "WEAK";
         }
@@ -43,3 +47,5 @@ public class PasswordStrengthService {
         return "VERY_STRONG";
     }
 }
+
+

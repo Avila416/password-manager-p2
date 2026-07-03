@@ -1,8 +1,11 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class MasterPasswordSetupDTO {
     @NotBlank(message = "Master password is required")
     @Size(min = 6, max = 128, message = "Master password length must be between 6 and 128")
@@ -28,3 +31,4 @@ public class MasterPasswordSetupDTO {
         this.confirmMasterPassword = confirmMasterPassword;
     }
 }
+

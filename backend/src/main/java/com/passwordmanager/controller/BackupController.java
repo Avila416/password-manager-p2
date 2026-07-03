@@ -1,5 +1,7 @@
 package com.passwordmanager.controller;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.passwordmanager.service.BackupService;
 import org.springframework.util.StringUtils;
@@ -11,6 +13,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/backup")
 @Validated
+@Slf4j
 public class BackupController {
 
     private final BackupService service;
@@ -21,31 +24,37 @@ public class BackupController {
 
     @GetMapping("/export")
     public String export() {
+        log.info("BackupController.export called");
         return service.exportBackup();
     }
 
     @PostMapping("/restore")
     public Map<String, Object> restore(@RequestBody JsonNode req) {
+        log.info("BackupController.restore called");
         return service.restoreBackup(extractFileContent(req));
     }
 
     @PutMapping("/update")
     public Map<String, Object> updateBackup(@RequestBody JsonNode req) {
+        log.info("BackupController.updateBackup called");
         return service.updateAndRestoreBackup(extractFileContent(req));
     }
 
     @PatchMapping("/validate")
     public Map<String, Object> validateBackup(@RequestBody JsonNode req) {
+        log.info("BackupController.validateBackup called");
         return service.validateAndRestoreBackup(extractFileContent(req));
     }
 
     @DeleteMapping("/delete")
     public String deleteBackup() {
+        log.info("BackupController.deleteBackup called");
         return service.deleteBackup();
     }
 
     @GetMapping("/latest")
     public Map<String, Object> latestBackup() {
+        log.info("BackupController.latestBackup called");
         return service.latestBackupInfo();
     }
 
@@ -77,3 +86,5 @@ public class BackupController {
         return content;
     }
 }
+
+

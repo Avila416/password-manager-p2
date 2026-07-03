@@ -1,7 +1,10 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 
+@Slf4j
 public class AuditLogResponse {
 
     private String action;
@@ -51,3 +54,4 @@ public class AuditLogResponse {
         this.time = time;
     }
 }
+

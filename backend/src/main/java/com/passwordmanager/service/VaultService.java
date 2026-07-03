@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.dto.PasswordEntryRequestDTO;
 import com.passwordmanager.dto.PasswordEntryResponseDTO;
 import com.passwordmanager.dto.SearchFilterDTO;
@@ -24,6 +26,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VaultService {
 
     private final PasswordEntryRepository passwordEntryRepository;
@@ -33,6 +36,7 @@ public class VaultService {
     private final BackupService backupService;
 
     public PasswordEntryResponseDTO addEntry(PasswordEntryRequestDTO dto) {
+        log.info("VaultService.addEntry called");
         String encryptedPassword = encryptionUtil.encrypt(dto.getPassword());
         String normalizedTitle = normalizeTitle(dto.getTitle(), dto.getUsername());
         PasswordEntry saved = passwordEntryRepository.save(
@@ -50,6 +54,7 @@ public class VaultService {
     }
 
     public List<PasswordEntryResponseDTO> getAllEntries() {
+        log.info("VaultService.getAllEntries called");
         return passwordEntryRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::toVaultResponse)
@@ -58,6 +63,7 @@ public class VaultService {
 
     @Transactional
     public PasswordEntryResponseDTO updateEntry(Long id, UpdatePasswordEntryDTO dto) {
+        log.info("VaultService.updateEntry called");
         PasswordEntry entry = passwordEntryRepository.findById(id)
                 .orElseThrow(() -> new InvalidInputException("Entry not found"));
 
@@ -74,6 +80,7 @@ public class VaultService {
 
     @Transactional
     public void deleteEntry(Long id, String masterPassword) {
+        log.info("VaultService.deleteEntry called");
         if (!masterPasswordValidator.verify(masterPassword)) {
             throw new UnauthorizedAccessException("Invalid master password");
         }
@@ -87,6 +94,7 @@ public class VaultService {
     }
 
     public PasswordEntryResponseDTO getEntryById(Long id, String masterPassword) {
+        log.info("VaultService.getEntryById called");
         if (!masterPasswordValidator.verify(masterPassword)) {
             throw new UnauthorizedAccessException("Invalid master password");
         }
@@ -97,6 +105,7 @@ public class VaultService {
 
     @Transactional
     public void markFavorite(Long id) {
+        log.info("VaultService.markFavorite called");
         PasswordEntry entry = passwordEntryRepository.findById(id)
                 .orElseThrow(() -> new InvalidInputException("Entry not found"));
         entry.setFavorite(true);
@@ -104,6 +113,7 @@ public class VaultService {
     }
 
     public List<PasswordEntryResponseDTO> getFavoritesEntries() {
+        log.info("VaultService.getFavoritesEntries called");
         return passwordEntryRepository.findAllByFavoriteTrueOrderByCreatedAtDesc()
                 .stream()
                 .map(this::toVaultResponse)
@@ -111,6 +121,7 @@ public class VaultService {
     }
 
     public List<PasswordEntryResponseDTO> getEntriesByDomain(String domain) {
+        log.info("VaultService.getEntriesByDomain called");
         String normalized = domain == null ? "" : domain.trim().toLowerCase(Locale.ROOT);
         if (normalized.isBlank()) {
             return getAllEntries();
@@ -121,6 +132,7 @@ public class VaultService {
     }
 
     public List<PasswordEntryResponseDTO> searchAndFilter(SearchFilterDTO dto, String sortBy, String direction) {
+        log.info("VaultService.searchAndFilter called");
         String keyword = dto == null || dto.getKeyword() == null
                 ? ""
                 : dto.getKeyword().trim().toLowerCase(Locale.ROOT);
@@ -154,6 +166,7 @@ public class VaultService {
 
     @Transactional
     public long clearGeneratedPasswords() {
+        log.info("VaultService.clearGeneratedPasswords called");
         return passwordEntryRepository.deleteByUsername("generated-user");
     }
 
@@ -244,3 +257,5 @@ public class VaultService {
         return "";
     }
 }
+
+

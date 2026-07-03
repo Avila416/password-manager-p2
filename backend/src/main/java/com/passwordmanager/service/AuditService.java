@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.dto.AlertResponse;
 import com.passwordmanager.dto.AuditLogResponse;
 import com.passwordmanager.dto.AuditResponse;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuditService {
 
     private final PasswordEntryRepository repo;
@@ -40,6 +43,7 @@ public class AuditService {
     private final EncryptionUtil encryptionUtil;
 
     public void log(String action, String ip, String status) {
+        log.info("AuditService.log called");
         if (isBlank(action) || isBlank(ip) || isBlank(status)) {
             throw new AuditException("Action, IP, and status are required");
         }
@@ -57,6 +61,7 @@ public class AuditService {
     }
 
     public List<AuditLogResponse> getLogs() {
+        log.info("AuditService.getLogs called");
         try {
             return auditLogRepository.findAll()
                     .stream()
@@ -70,6 +75,7 @@ public class AuditService {
     }
 
     public AuditResponse generateAudit() {
+        log.info("AuditService.generateAudit called");
         List<PasswordEntry> list = repo.findAllByOrderByCreatedAtDesc();
 
         if (list.isEmpty()) {
@@ -169,6 +175,7 @@ public class AuditService {
     }
 
     public List<AlertResponse> getRecentAlerts() {
+        log.info("AuditService.getRecentAlerts called");
         return alertRepo.findTop100ByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::toAlertResponse)
@@ -176,6 +183,7 @@ public class AuditService {
     }
 
     public List<StoredPasswordAnalysisResponse> analyzeStoredPasswords() {
+        log.info("AuditService.analyzeStoredPasswords called");
         List<PasswordEntry> list = repo.findAllByOrderByCreatedAtDesc();
         Map<String, Integer> useMap = new HashMap<>();
 
@@ -192,6 +200,7 @@ public class AuditService {
     }
 
     public String clearAuditHistory() {
+        log.info("AuditService.clearAuditHistory called");
         long alertCount = alertRepo.count();
         long reportCount = auditReportRepository.count();
 
@@ -299,4 +308,6 @@ public class AuditService {
         return value == null || value.trim().isEmpty();
     }
 }
+
+
 

@@ -1,10 +1,13 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class OtpVerifyRequestDTO {
 
     @NotBlank(message = "Email is required")
@@ -32,3 +35,4 @@ public class OtpVerifyRequestDTO {
         this.otp = otp;
     }
 }
+

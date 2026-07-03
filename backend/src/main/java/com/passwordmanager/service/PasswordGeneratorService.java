@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.dto.GeneratePasswordRequest;
 import com.passwordmanager.dto.PasswordResponse;
 import com.passwordmanager.exception.InvalidInputException;
@@ -13,12 +15,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PasswordGeneratorService {
 
     private final PasswordUtil util;
     private final PasswordStrengthService strengthService;
 
     public List<PasswordResponse> generate(GeneratePasswordRequest req) {
+        log.info("PasswordGeneratorService.generate called");
         if (req.getLength() < 8 || req.getLength() > 64) {
             throw new InvalidInputException("Password length must be between 8 and 64");
         }
@@ -57,3 +61,5 @@ public class PasswordGeneratorService {
         return list;
     }
 }
+
+

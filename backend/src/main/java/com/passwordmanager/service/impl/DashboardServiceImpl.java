@@ -1,5 +1,7 @@
 package com.passwordmanager.service.impl;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.dto.DashboardResponse;
 import com.passwordmanager.exception.DashboardException;
 import com.passwordmanager.repository.AuditLogRepository;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class DashboardServiceImpl implements DashboardService {
 
     private final PasswordEntryRepository passwordEntryRepository;
@@ -28,6 +31,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public DashboardResponse getDashboard() {
+        log.info("DashboardServiceImpl.getDashboard called");
         try {
             long totalPasswords = passwordEntryRepository.count();
             long recentlyAdded = passwordEntryRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(7));
@@ -54,3 +58,5 @@ public class DashboardServiceImpl implements DashboardService {
         return !(hasDigit && hasUpper && hasLower && hasSymbol);
     }
 }
+
+

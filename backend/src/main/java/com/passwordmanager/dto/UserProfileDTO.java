@@ -1,5 +1,8 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class UserProfileDTO {
     private Long id;
     private String name;
@@ -47,3 +50,4 @@ public class UserProfileDTO {
         this.phone = phone;
     }
 }
+

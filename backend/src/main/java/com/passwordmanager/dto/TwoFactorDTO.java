@@ -1,10 +1,13 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class TwoFactorDTO {
     @NotBlank(message = "Email is required")
     @Email(message = "Email format is invalid")
@@ -30,3 +33,4 @@ public class TwoFactorDTO {
         this.otp = otp;
     }
 }
+

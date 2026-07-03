@@ -1,5 +1,7 @@
 package com.passwordmanager.service.impl;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.passwordmanager.entity.BackupFile;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class BackupServiceImpl implements BackupService {
 
     private final BackupFileRepository backupFileRepository;
@@ -62,6 +65,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public String exportBackup() {
+        log.info("BackupServiceImpl.exportBackup called");
         String vaultSnapshot = serializeVaultSnapshot();
         String encrypted = encryptionUtil.encrypt(vaultSnapshot);
         String checksum = sha256(encrypted);
@@ -83,6 +87,7 @@ public class BackupServiceImpl implements BackupService {
     @Override
     @Transactional
     public Map<String, Object> restoreBackup(String fileContent) {
+        log.info("BackupServiceImpl.restoreBackup called");
         if (!isValidPayload(fileContent)) {
             auditService.log(AuditActions.BACKUP_RESTORE, "127.0.0.1", "FAILED");
             throw new BackupException("Invalid backup content");
@@ -149,6 +154,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public Map<String, Object> updateBackup(String fileContent) {
+        log.info("BackupServiceImpl.updateBackup called");
         if (!isValidPayload(fileContent)) {
             auditService.log(AuditActions.BACKUP_UPDATE, "127.0.0.1", "FAILED");
             throw new BackupException("Invalid backup content");
@@ -181,6 +187,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public Map<String, Object> validateBackup(String fileContent) {
+        log.info("BackupServiceImpl.validateBackup called");
         boolean valid = isValidPayload(fileContent);
         auditService.log(AuditActions.BACKUP_VALIDATE, "127.0.0.1", valid ? "SUCCESS" : "FAILED");
         if (!valid) {
@@ -199,6 +206,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public String deleteBackup() {
+        log.info("BackupServiceImpl.deleteBackup called");
         List<BackupFile> backups = backupFileRepository.findAll();
         if (backups.isEmpty()) {
             auditService.log(AuditActions.BACKUP_DELETE, "127.0.0.1", "FAILED");
@@ -213,6 +221,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public Map<String, Object> latestBackupInfo() {
+        log.info("BackupServiceImpl.latestBackupInfo called");
         List<BackupFile> backups = backupFileRepository.findAll();
         if (backups.isEmpty()) {
             return Map.of(
@@ -243,6 +252,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public boolean hasValidBackup() {
+        log.info("BackupServiceImpl.hasValidBackup called");
         List<BackupFile> backups = backupFileRepository.findAll();
         if (backups.isEmpty()) {
             return false;
@@ -258,6 +268,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public String getLatestBackupContent() {
+        log.info("BackupServiceImpl.getLatestBackupContent called");
         List<BackupFile> backups = backupFileRepository.findAll();
         if (backups.isEmpty()) {
             return null;
@@ -272,6 +283,7 @@ public class BackupServiceImpl implements BackupService {
     @Override
     @Transactional
     public Map<String, Object> validateAndRestoreBackup(String fileContent) {
+        log.info("BackupServiceImpl.validateAndRestoreBackup called");
         // First validate the backup
         Map<String, Object> validationResult = validateBackup(fileContent);
 
@@ -292,6 +304,7 @@ public class BackupServiceImpl implements BackupService {
     @Override
     @Transactional
     public Map<String, Object> updateAndRestoreBackup(String fileContent) {
+        log.info("BackupServiceImpl.updateAndRestoreBackup called");
         // First update the backup
         Map<String, Object> updateResult = updateBackup(fileContent);
 
@@ -393,3 +406,5 @@ public class BackupServiceImpl implements BackupService {
         return directory.resolve(fileName).normalize();
     }
 }
+
+

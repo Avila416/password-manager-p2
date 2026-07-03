@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.util.Locale;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,7 @@ import com.passwordmanager.security.JwtUtil;
 import com.passwordmanager.validator.AuthValidator;
 
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -49,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO register(RegisterRequestDTO request) {
+        log.info("AuthServiceImpl.register called");
         authValidator.validateRegister(request);
 
         String normalizedEmail = normalizeEmail(request.getEmail());
@@ -71,6 +75,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO login(LoginRequestDTO request) {
+        log.info("AuthServiceImpl.login called");
         authValidator.validateLogin(request);
 
         User user = userRepository.findByEmail(normalizeEmail(request.getEmail()))
@@ -93,6 +98,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void setupMasterPassword(String email, String masterPassword, String confirmMasterPassword) {
+        log.info("AuthServiceImpl.setupMasterPassword called");
         User user = findUserByEmail(email);
         if (masterPassword == null || confirmMasterPassword == null) {
             throw new ValidationException("Master password and confirm password are required");
@@ -107,12 +113,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void requestForgotPasswordCode(String email) {
+        log.info("AuthServiceImpl.requestForgotPasswordCode called");
         User user = findUserByEmail(email);
         verificationService.generateCode(user.getEmail());
     }
 
     @Override
     public void resetForgotPassword(ForgotPasswordRequestDTO request) {
+        log.info("AuthServiceImpl.resetForgotPassword called");
         if (request == null) {
             throw new ValidationException("Request body is required");
         }
@@ -139,12 +147,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void requestForgotMasterPasswordCode(String email) {
+        log.info("AuthServiceImpl.requestForgotMasterPasswordCode called");
         User user = findUserByEmail(email);
         verificationService.generateCode(user.getEmail());
     }
 
     @Override
     public void resetForgotMasterPassword(ForgotMasterPasswordRequestDTO request) {
+        log.info("AuthServiceImpl.resetForgotMasterPassword called");
         if (request == null) {
             throw new ValidationException("Request body is required");
         }
@@ -171,6 +181,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void changeMasterPassword(String email, ChangePasswordDTO request) {
+        log.info("AuthServiceImpl.changeMasterPassword called");
         if (request == null) {
             throw new ValidationException("Request body is required");
         }
@@ -196,6 +207,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TwoFactorStatusDTO updateTwoFactorStatus(String email, TwoFactorStatusDTO request) {
+        log.info("AuthServiceImpl.updateTwoFactorStatus called");
         if (request == null) {
             throw new ValidationException("Request body is required");
         }
@@ -228,3 +240,5 @@ public class AuthServiceImpl implements AuthService {
         return value.trim();
     }
 }
+
+

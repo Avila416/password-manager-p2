@@ -1,7 +1,10 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
+@Slf4j
 public class DashboardResponse {
 
     private long totalPasswords;
@@ -57,3 +60,4 @@ public class DashboardResponse {
         this.actionStats = actionStats;
     }
 }
+

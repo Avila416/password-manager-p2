@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +13,7 @@ import com.passwordmanager.util.EmailSimulationUtil;
 import com.passwordmanager.util.OtpGenerator;
 
 @Service
+@Slf4j
 public class TwoFactorServiceImpl implements TwoFactorService {
     private static final int OTP_LENGTH = 6;
     private static final long OTP_TTL_SECONDS = 300;
@@ -27,6 +30,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 
     @Override
     public void requestOtp(String email) {
+        log.info("TwoFactorServiceImpl.requestOtp called");
         validateEmail(email);
 
         String otp = otpGenerator.generateOtp(OTP_LENGTH);
@@ -37,6 +41,7 @@ public class TwoFactorServiceImpl implements TwoFactorService {
 
     @Override
     public boolean verifyOtp(String email, String otp) {
+        log.info("TwoFactorServiceImpl.verifyOtp called");
         validateEmail(email);
         if (otp == null || otp.isBlank()) {
             return false;
@@ -89,3 +94,5 @@ public class TwoFactorServiceImpl implements TwoFactorService {
         }
     }
 }
+
+

@@ -1,10 +1,13 @@
 package com.passwordmanager.entity;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Slf4j
 public class VaultEntry {
 
     @Id
@@ -94,3 +97,4 @@ public class VaultEntry {
         this.createdAt = createdAt;
     }
 }
+

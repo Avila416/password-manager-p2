@@ -1,5 +1,8 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class AuthResponseDTO {
     private String token;
     private String message;
@@ -25,3 +28,4 @@ public class AuthResponseDTO {
         this.message = message;
     }
 }
+

@@ -1,5 +1,7 @@
 package com.passwordmanager.util;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -8,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
+@Slf4j
 public class PasswordUtil {
 
     private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -84,3 +87,4 @@ public class PasswordUtil {
         return source.charAt(random.nextInt(source.length()));
     }
 }
+

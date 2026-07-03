@@ -1,5 +1,7 @@
 package com.passwordmanager.security;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
@@ -8,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
@@ -33,3 +36,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .build();
     }
 }
+

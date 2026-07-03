@@ -1,5 +1,7 @@
 package com.passwordmanager.controller;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 import jakarta.validation.Valid;
@@ -39,6 +41,7 @@ import com.passwordmanager.service.TwoFactorService;
 @RestController
 @RequestMapping("/auth")
 @Validated
+@Slf4j
 public class AuthenticationController {
     private final AuthService authService;
     private final TwoFactorService twoFactorService;
@@ -58,34 +61,40 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
+        log.info("AuthenticationController.register called");
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+        log.info("AuthenticationController.login called");
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/password/forgot/request")
     public ResponseEntity<Map<String, String>> requestForgotPasswordCode(@Valid @RequestBody EmailRequestDTO request) {
+        log.info("AuthenticationController.requestForgotPasswordCode called");
         authService.requestForgotPasswordCode(request.getEmail());
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
 
     @PostMapping("/password/forgot/reset")
     public ResponseEntity<Map<String, String>> resetForgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO request) {
+        log.info("AuthenticationController.resetForgotPassword called");
         authService.resetForgotPassword(request);
         return ResponseEntity.ok(Map.of("message", "Password reset successful"));
     }
 
     @PostMapping("/master-password/forgot/request")
     public ResponseEntity<Map<String, String>> requestForgotMasterPasswordCode(@Valid @RequestBody EmailRequestDTO request) {
+        log.info("AuthenticationController.requestForgotMasterPasswordCode called");
         authService.requestForgotMasterPasswordCode(request.getEmail());
         return ResponseEntity.ok(Map.of("message", "Verification code sent"));
     }
 
     @PostMapping("/master-password/forgot/reset")
     public ResponseEntity<Map<String, String>> resetForgotMasterPassword(@Valid @RequestBody ForgotMasterPasswordRequestDTO request) {
+        log.info("AuthenticationController.resetForgotMasterPassword called");
         authService.resetForgotMasterPassword(request);
         return ResponseEntity.ok(Map.of("message", "Master password reset successful"));
     }
@@ -93,6 +102,7 @@ public class AuthenticationController {
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        log.info("AuthenticationController.logout called");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new UnauthorizedAccessException("Authorization header is required");
         }
@@ -104,6 +114,7 @@ public class AuthenticationController {
 
     @GetMapping("/account")
     public ResponseEntity<UserProfileDTO> getAccount() {
+        log.info("AuthenticationController.getAccount called");
         User user = getCurrentUser();
         UserProfileDTO profile = new UserProfileDTO();
         profile.setId(user.getId());
@@ -116,6 +127,7 @@ public class AuthenticationController {
 
     @PostMapping("/master-password/setup")
     public ResponseEntity<Map<String, String>> setupMasterPassword(@Valid @RequestBody MasterPasswordSetupDTO request) {
+        log.info("AuthenticationController.setupMasterPassword called");
         authService.setupMasterPassword(
                 getCurrentUserEmail(),
                 request.getMasterPassword(),
@@ -125,23 +137,27 @@ public class AuthenticationController {
 
     @PutMapping("/master-password/change")
     public ResponseEntity<Map<String, String>> changeMasterPassword(@Valid @RequestBody ChangePasswordDTO request) {
+        log.info("AuthenticationController.changeMasterPassword called");
         authService.changeMasterPassword(getCurrentUserEmail(), request);
         return ResponseEntity.ok(Map.of("message", "Master password changed successfully"));
     }
 
     @PutMapping("/2fa/status")
     public ResponseEntity<TwoFactorStatusDTO> updateTwoFactorStatus(@Valid @RequestBody TwoFactorStatusDTO request) {
+        log.info("AuthenticationController.updateTwoFactorStatus called");
         return ResponseEntity.ok(authService.updateTwoFactorStatus(getCurrentUserEmail(), request));
     }
 
     @PostMapping("/2fa/request")
     public ResponseEntity<Map<String, String>> requestOtp(@Valid @RequestBody TwoFactorDTO request) {
+        log.info("AuthenticationController.requestOtp called");
         twoFactorService.requestOtp(request.getEmail());
         return ResponseEntity.ok(Map.of("message", "OTP sent"));
     }
 
     @PostMapping("/2fa/verify")
     public ResponseEntity<Map<String, Object>> verifyOtp(@Valid @RequestBody OtpVerifyRequestDTO request) {
+        log.info("AuthenticationController.verifyOtp called");
         boolean verified = twoFactorService.verifyOtp(request.getEmail(), request.getOtp());
         if (!verified) {
             throw new UnauthorizedAccessException("Invalid or expired OTP");
@@ -166,3 +182,7 @@ public class AuthenticationController {
         return email.trim().toLowerCase();
     }
 }
+
+
+
+

@@ -1,9 +1,12 @@
 package com.passwordmanager.entity;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
+@Slf4j
 public class User {
 
     @Id
@@ -80,3 +83,4 @@ public class User {
     }
 
 }
+

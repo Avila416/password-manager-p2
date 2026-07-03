@@ -1,8 +1,11 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class RestoreRequest {
 
     @NotBlank(message = "Backup content is required")
@@ -20,3 +23,4 @@ public class RestoreRequest {
         this.fileContent = fileContent;
     }
 }
+

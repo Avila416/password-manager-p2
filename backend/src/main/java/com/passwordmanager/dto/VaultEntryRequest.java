@@ -1,8 +1,11 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Slf4j
 public class VaultEntryRequest {
 
     @NotBlank(message = "Title is required")
@@ -55,3 +58,4 @@ public class VaultEntryRequest {
         this.website = website;
     }
 }
+

@@ -1,5 +1,7 @@
 package com.passwordmanager.config;
 
+
+import lombok.extern.slf4j.Slf4j;
 import com.passwordmanager.entity.VaultEntry;
 import com.passwordmanager.repository.VaultEntryRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
+@Slf4j
 public class DataInitializer implements CommandLineRunner {
 
     private final VaultEntryRepository vaultEntryRepository;
@@ -27,3 +30,4 @@ public class DataInitializer implements CommandLineRunner {
         vaultEntryRepository.save(new VaultEntry(null, "Work", "employee01", "An0ther#Pass", LocalDateTime.now().minusDays(10)));
     }
 }
+

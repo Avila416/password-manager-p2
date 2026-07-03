@@ -1,5 +1,7 @@
 package com.passwordmanager;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,9 +19,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 )
 @EnableJpaRepositories(basePackages = "com.passwordmanager.repository")
 @EntityScan(basePackages = "com.passwordmanager.entity")
+@Slf4j
 public class PasswordManagerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(PasswordManagerApplication.class, args);
     }
 }
+

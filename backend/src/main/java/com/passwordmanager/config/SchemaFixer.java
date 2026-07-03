@@ -1,10 +1,13 @@
 package com.passwordmanager.config;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class SchemaFixer implements CommandLineRunner {
 
     private final JdbcTemplate jdbcTemplate;
@@ -18,3 +21,4 @@ public class SchemaFixer implements CommandLineRunner {
         jdbcTemplate.execute("ALTER TABLE backup_file MODIFY COLUMN encrypted_content LONGTEXT NOT NULL");
     }
 }
+

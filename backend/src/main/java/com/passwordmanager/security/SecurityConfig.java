@@ -1,5 +1,7 @@
 package com.passwordmanager.security;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@Slf4j
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final CustomUserDetailsService customUserDetailsService;
@@ -86,5 +89,6 @@ public class SecurityConfig {
     }
 
 }
+
 
 

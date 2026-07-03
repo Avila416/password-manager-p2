@@ -1,5 +1,7 @@
 package com.passwordmanager.entity;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Slf4j
 public class PasswordEntry {
 
     @Id
@@ -32,3 +35,4 @@ public class PasswordEntry {
 
     private LocalDateTime createdAt;
 }
+

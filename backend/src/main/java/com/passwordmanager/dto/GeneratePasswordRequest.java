@@ -1,10 +1,13 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
+@Slf4j
 public class GeneratePasswordRequest {
 
     @Min(value = 8, message = "Length must be at least 8")
@@ -19,3 +22,4 @@ public class GeneratePasswordRequest {
     @Max(value = 20, message = "Count must be at most 20")
     private int count; // generate multiple
 }
+

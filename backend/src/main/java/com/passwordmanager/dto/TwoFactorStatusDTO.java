@@ -1,5 +1,8 @@
 package com.passwordmanager.dto;
 
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class TwoFactorStatusDTO {
     private boolean enabled;
 
@@ -11,3 +14,4 @@ public class TwoFactorStatusDTO {
         this.enabled = enabled;
     }
 }
+

@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.passwordmanager.security.JwtUtil;
 
 @Service
+@Slf4j
 public class TokenBlacklistServiceImpl implements TokenBlacklistService {
 
     private final Map<String, Long> blacklist = new ConcurrentHashMap<>();
@@ -20,12 +23,14 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService {
 
     @Override
     public void blacklistToken(String token) {
+        log.info("TokenBlacklistServiceImpl.blacklistToken called");
         Date expiry = jwtUtil.extractExpiration(token);
         blacklist.put(token, expiry.getTime());
     }
 
     @Override
     public boolean isBlacklisted(String token) {
+        log.info("TokenBlacklistServiceImpl.isBlacklisted called");
         Long expiry = blacklist.get(token);
         if (expiry == null) {
             return false;
@@ -37,3 +42,5 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService {
         return true;
     }
 }
+
+

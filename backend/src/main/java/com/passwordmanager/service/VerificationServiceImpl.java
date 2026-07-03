@@ -1,5 +1,7 @@
 package com.passwordmanager.service;
 
+
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import com.passwordmanager.util.OtpGenerator;
 
 @Service
 @Transactional
+@Slf4j
 public class VerificationServiceImpl implements VerificationService {
     private static final int CODE_LENGTH = 6;
     private static final int CODE_EXPIRY_MINUTES = 5;
@@ -32,6 +35,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public void generateCode(String email) {
+        log.info("VerificationServiceImpl.generateCode called");
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Email is required");
         }
@@ -50,6 +54,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public boolean verifyCode(String email, String code) {
+        log.info("VerificationServiceImpl.verifyCode called");
         if (email == null || email.isBlank() || code == null || code.isBlank()) {
             return false;
         }
@@ -75,3 +80,5 @@ public class VerificationServiceImpl implements VerificationService {
         return matches;
     }
 }
+
+
